@@ -35,23 +35,20 @@ class BoardGame:
         
         # Texto de jogadores
         j1_pontos = 34
-        self.write_text("Jogador 1", x=145, y=65, size=26, color="white", font="font_kid")
-        self.write_text(f"{j1_pontos} pontos", x=131, y=92, size=34, color="white", font="font_kid")
+        self.write_text(f"{j1_pontos} pontos", x=137, y=92, size=34, color="white", font="font_kid")
         
         j2_pontos = 27
-        self.write_text("Jogador 2", x=1034, y=65, size=26, color="white", font="font_kid")
-        self.write_text(f"{j2_pontos} pontos", x=1025, y=92, size=34, color="white", font="font_kid")
+        self.write_text(f"{j2_pontos} pontos", x=1023, y=92, size=34, color="white", font="font_kid")
         
         # Inicia Baralho de compras
         self.compra_fundo = ImageTk.PhotoImage(file="assets/jogo/compra_fundo.png")
-        self.canvas.create_image(540, 40, image=self.compra_fundo, anchor=NW)
+        self.canvas.create_image(530, 40, image=self.compra_fundo, anchor=NW)
         
         self.compra = ImageTk.PhotoImage(file="assets/jogo/compra.png")
         self.canvas.create_image(455, 8, image=self.compra, anchor=NW)
         
         cartas_restantes = 35
-        self.write_text("baralho de compra", x=600, y=59, size=19, color="#FF4D8D", font="quicksand bold")
-        self.write_text(f"{cartas_restantes} cartas restantes", x=600, y=80, size=18, color="#FF4D8D", font="quicksand")
+        self.write_text(f"{cartas_restantes} cartas restantes", x=604, y=80, size=18, color="#FF4D8D", font="quicksand")
         
         # Inicia o programa
         self.mainWindow.mainloop()
