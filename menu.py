@@ -3,13 +3,16 @@ from PIL import ImageTk
 import math  
 
 class MainMenu:
-    def __init__(self):
+    def __init__(self, main_menu_frame, game_frame):
         # Inicia a tela
-        self.mainWindow = Tk()
-        self.mainWindow.title("Soma10")
-        self.mainWindow.geometry("1280x720")
-        self.mainWindow.resizable(False, False)
-        self.canvas = Canvas(self.mainWindow, width=1280, height=720)
+        self.main_menu_frame = main_menu_frame
+        self.game_frame = game_frame
+
+        # Configura o frame para o menu
+        self.main_menu_frame.pack(fill='both', expand=True)
+
+        # Adicione os widgets do menu aqui...
+        self.canvas = Canvas(self.main_menu_frame, width=1280, height=720)
         self.canvas.pack()
 
         # Inicia Background
@@ -26,9 +29,6 @@ class MainMenu:
         self.create_button("iniciar", 415, 485)
         self.create_button("tutorial", 642, 485)
 
-        # Inicia o programa
-        self.mainWindow.mainloop()
-
     # Funcao para gerenciar a animacao da logo do menu
     def animate_logo(self):
         # Calculo e atualizacao do movimento pela funcao seno
@@ -39,7 +39,7 @@ class MainMenu:
         if self.direction >= 360:
             self.direction = 0
 
-        self.mainWindow.after(10, self.animate_logo)
+        self.main_menu_frame.after(10, self.animate_logo)
         
     # Funcao para criar e gerar um botao na tela
     def create_button(self, name, x, y):
@@ -59,10 +59,15 @@ class MainMenu:
         self.canvas.tag_bind(button_id, "<Enter>", lambda event: self.move_button(event, button_id, x, y, 0, 2))
         self.canvas.tag_bind(button_id, "<Button-1>", lambda event: self.move_button(event, button_id, x, y, -2, 8))
         self.canvas.tag_bind(button_id, "<Leave>", lambda event: self.move_button(event, button_id, x, y, 2, -2))
+        
+        if name == "iniciar":
+            self.canvas.tag_bind(button_id, "<Button-1>", lambda event: self.start_game())
 
     # Funcao para gerenciar o movimento do botao quando passar o mouse por cima
     def move_button(self, event, button_id, x, y, dx, dy):
         self.canvas.coords(button_id, x + dx, y + dy)
-
-
-MainMenu()
+        
+    def start_game(self):
+        # Esconde o menu principal e mostra o frame do jogo
+        self.main_menu_frame.pack_forget()
+        self.game_frame.pack(fill='both', expand=True)
