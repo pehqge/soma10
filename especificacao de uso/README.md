@@ -76,7 +76,7 @@ Ao total o baralho conta com 66 fichas enumeradas de 1 a 7, sendo:
 - 2 fichas número 7
 
 <div style="text-align: center;">
-    <img src="../assets/jogo/fichas.png">
+    <img src="../assets/relatorios/fichas.png">
     <p style="font-style: italic; font-size: 12px;">Figura X. Fichas do jogo soma 10.  </p>
 </div>
 
