@@ -1,0 +1,1 @@
+Diretório dedicado ao armazenamento dos diagramas UML feitos pelo grupo
