@@ -83,12 +83,12 @@ O software desenvolvido conta com a arquitetura cliente-servidor distribuído.
 **Requisito não funcional 2 - modelo de interface gráfica:** A interface gráfica deve ser construída com base nas figuras 1 e 2.
 
 <div style="text-align: center;">
-    <img src="../assets/relatorios/menu.png">
+    <img src="../assets/docs/menu.png">
     <p style="font-style: italic; font-size: 12px;">Figura 1. Interface do menu inicial do jogo.  </p>
 </div>
 
 <div style="text-align: center;">
-    <img src="../assets/relatorios/partida.png">
+    <img src="../assets/docs/partida.png">
     <p style="font-style: italic; font-size: 12px;">Figura 2. Interface da partida.  </p>
 </div>
 
@@ -106,10 +106,10 @@ Ao total o baralho conta com 66 fichas enumeradas de 1 a 7, sendo:
 - 8 fichas número 4;
 - 4 fichas número 5;
 - 2 fichas número 6;
-- 2 fichas número 7
+- 2 fichas número 7.
 
 <div style="text-align: center;">
-    <img src="../assets/relatorios/fichas.png">
+    <img src="../assets/docs/fichas.png">
     <p style="font-style: italic; font-size: 12px;">Figura 3. Fichas do jogo soma 10.  </p>
 </div>
 
