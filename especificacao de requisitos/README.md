@@ -62,20 +62,26 @@ O software desenvolvido conta com a arquitetura cliente-servidor distribuído.
 
 **Requisito funcional 2 - iniciar partida:** Ao clicar no botão 'iniciar', o programa deve exibir toda a interface da partida.
 
-**Requisito funcional 3 - distribuição de fiehcas iniciais:** O programa deve iniciar a partida distribuindo 3 fichas para cada jogador, retiradas aleatoriamente do baralho.
+**Requisito funcional 3 - distribuição de fiehcas iniciais:** O programa deve iniciar a partida distribuindo 3 cartas para cada jogador, retiradas aleatoriamente do baralho.
 
 
-**Requisito funcional 4 - exibir tutorial do jogo:** OO programa deve contar com um botão para o tutorial do jogo no menu inicial, que ao ser clicado, exibe as regras e instruções em uma nova janela ou seção.
+**Requisito funcional 4 - exibir tutorial do jogo:** O programa deve contar com um botão para o tutorial do jogo no menu inicial, que ao ser clicado, exibe as regras e instruções do jogo em uma nova janela ou seção.
 
 **Requisito funcional 5 - colocar uma ficha no tabuleiro:** O programa deve permitir que o jogador selecione uma ficha da sua mão e a posicione em uma casa vazia no tabuleiro.
 
-**Requisito funcional 6 - verificar somas de 10:** Ao posicionar uma ficha, o programa deve automaticamente verificar se a soma das fichas em uma linha, coluna ou diagonal resulta em 10 e, em caso afirmativo, recolher as fichas dessa linha e somá-las ao total do jogador.
+**Requisito funcional 6 - verificar somas de 10:** Ao posicionar uma ficha, o programa deve automaticamente verificar se a soma das cartas em uma linha, coluna ou diagonal resulta em 10 e, em caso afirmativo, recolher as cartas dessa linha e somá-las ao total do jogador.
 
-**Requisito funcional 7 - repor fichas da mão:** Após o jogador inserir uma ficha no tabuleiro, o programa deve permitir que o usuário retire uma carta do baralho.
+**Requisito funcional 7 - repor cartas da mão:** Após o jogador inserir uma ficha no tabuleiro, o programa deve permitir que o usuário retire uma carta do baralho.
 
-**Requisito funcional 8 - finalizar a partida:** O programa deve finalizar a partida quando o baralho estiver vazio e exibir o vencedor com base no total de pontos acumulados.
+**Requisito funcional 8 - controlar equidade de cartas:** O programa deve garantir que o próximo jogador não possa iniciar sua jogada enquanto a quantidade de cartas nas mãos dos jogadores estiver desigual. A jogada só será liberada quando ambos os jogadores possuírem o mesmo número de cartas.
 
-**Requisito funcional 9 - exibir o placar:** O programa deve exibir o placar, mostrando a soma total de cada jogador e quem foi o campeão da partida.
+**Requisito funcional 9 -  controlar compra de carta em situação de impasse:** Se o jogador não puder realizar uma jogada com as cartas que possui, o programa deve permitir que ele compre apenas uma carta.
+
+**Requisito funcional 10 - validar soma nas fileiras:** O sistema deve validar as somas de forma que, ao inserir a segunda carta, a soma das duas primeiras da fileira deve ser igual ou inferior a 8. Ao inserir a terceira carta, a soma das três cartas da fileira deve ser igual ou inferior a 9.
+
+**Requisito funcional  11 - finalizar a partida:** O programa deve encerrar a partida quando o baralho estiver vazio e nenhum jogador puder realizar uma jogada válida. 
+
+**Requisito funcional 12 - exibir o placar:** O sistema deve exibir o placar, mostrando a soma total de cada jogador e quem foi o campeão da partida.
 
 ### 3.2 Requisitos não funcionais
 **Requisito não funcional 1 - tecnologia para interface gráfica:** O framework Tkinter deve ser utilizado para a construção da interface gráfica.
@@ -94,28 +100,38 @@ O software desenvolvido conta com a arquitetura cliente-servidor distribuído.
 
 ## Apêndice: Regras do jogo soma 10
 
-O jogo soma 10 consiste na disputa entre dois participantes em um tabuleiro de 16 casas interligadas entre si. O objetivo do jogo é somar mais pontos que o adversário.
+O jogo soma 10 consiste na disputa entre dois participantes em um tabuleiro de 16 casas interligadas entre si. O objetivo do jogo é conseguir o maior número de cartas através de somas que resultam em 10.
 
 #### Elementos do jogo
 
-Ao total o baralho conta com 66 fichas enumeradas de 1 a 7, sendo: 
+Ao total o baralho conta com 66 cartas enumeradas de 1 a 7, sendo: 
 
-- 18 fichas número 1;
-- 18 fichas número 2;
-- 14 fichas número 3;
-- 8 fichas número 4;
-- 4 fichas número 5;
-- 2 fichas número 6;
-- 2 fichas número 7.
+- 18 cartas número 1;
+- 18 cartas número 2;
+- 14 cartas número 3;
+- 8 cartas número 4;
+- 4 cartas número 5;
+- 2 cartas número 6;
+- 2 cartas número 7.
 
 <div style="text-align: center;">
-    <img src="../assets/docs/fichas.png">
-    <p style="font-style: italic; font-size: 12px;">Figura 3. Fichas do jogo soma 10.  </p>
+    <img src="../assets/docs/cartas.png">
+    <p style="font-style: italic; font-size: 12px;">Figura 3. Cartas do jogo soma 10.  </p>
 </div>
 
 #### Como jogar
 
 1. Cada jogador começa a partida com 3 cartas na mão.
-2. Ao colocar uma ficha no tabuleiro, o jogador deve comprar uma nova carta do monte.
-3. Se, durante a sua vez, o jogador conseguir somar 10 em uma linha vertical, horizontal ou diagonal, ele recolhe todas as 4 fichas dessa soma.
-4. Quando as cartas do baralho se esgotarem, o jogador com a maior soma total vence a partida.
+2. O jogador escolhe uma de suas cartas para colocar no tabuleiro, depois deve comprar uma nova carta do monte.
+3. Ao final de cada rodada, todos os jogadores devem ter exatamente o mesmo número de cartas. Caso um jogador tenha menos cartas, este deverá comprar no monte, se houver, até que seu número de cartas seja igual ao do outro jogador.
+4. Se, durante a sua vez, o jogador conseguir somar 10 em uma linha vertical, horizontal ou diagonal, ele recolhe todas as 4 cartas dessa soma.
+5. O jogo termina quando um dos competidores não puder mais realizar uma jogada, considerando as regras do jogo. Vence a partida quem possuir o maior número de cartas.
+
+##### Regras adicionais:
+- Ao inserir a segunda carta em uma fileira, a soma das duas primeiras cartas deve ser igual ou inferior a 8. Ao adicionar a terceira carta, a soma das três cartas da fileira deve ser igual ou inferior a 9. 
+
+- O competidor que colocar a quarta carta, completando a soma de 10, recolhe todas as cartas daquela fileira e as guarda para a contagem final de pontos. Após isso, a vez passa para o próximo jogador.
+
+- Se um jogador não puder realizar uma jogada com as cartas em sua mão, ele deve comprar uma carta do monte. Caso a nova carta ainda não permita uma jogada, ele deve passar a vez.
+
+- Quando não houver mais cartas no monte, o jogador realiza sua jogada, se possível, e em seguida passa a vez para o próximo jogador.
