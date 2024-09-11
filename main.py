@@ -5,6 +5,7 @@ from jogo import BoardGame
 # Inicialize a janela principal
 root = Tk()
 root.geometry("1280x720")
+root.resizable(False, False)
 root.title("Soma10")
 
 # Cria frames para o MainMenu e BoardGame
