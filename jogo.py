@@ -66,20 +66,109 @@ class BoardGame:
     def render_board(self, card=None):
         if card:
             print(f"Selecionou a ficha {card}")
-        
+            valid_positions = self.valid_moves(card)  # Obtém as posições válidas
+            
+            for i in range(4):
+                for j in range(4):
+                    self.blank_cell(i, j)  # Limpa a célula
+
+                    if self.board[i][j] != 0:
+                        # Renderiza a ficha normal
+                        self.canvas.create_image(392 + 124 * i, 174 + 124 * j, image=getattr(self, f"{self.board[i][j]}_original"), anchor=NW)
+                    elif (i, j) not in valid_positions:
+                        # Escurece as células inválidas
+                        self.dark_cell(i, j)
         else:
             for i in range(4):
                 for j in range(4):
-                    self.blank_cell(i, j)
+                    self.blank_cell(i, j)  # Apaga a célula
                     if self.board[i][j] != 0:
+                        # Renderiza a ficha normal
                         self.canvas.create_image(392 + 124 * i, 174 + 124 * j, image=getattr(self, f"{self.board[i][j]}_original"), anchor=NW)
         
+        # Verifica o check_sum10
         if self.check_sum10()[0]:
-            for i, j in self.check_sum10()[1]:
-                self.board[i][j] = 0
-                
-            self.j1_pontos += 4
-            self.render_board()
+            # Coleta as posições que precisam ser escurecidas
+            positions_to_clear = self.check_sum10()[1]
+
+            # Escurece as fichas
+            for i, j in positions_to_clear:
+                self.white_cell(i, j)  # Função que cria a célula escurecida
+
+            # Aguardar 1 segundo antes de apagar as fichas
+            self.canvas.after(1000, lambda: self.clear_cells(positions_to_clear))
+            
+    def valid_moves(self, card):
+        """Retorna uma lista de posições válidas para colocar a carta."""
+        valid_positions = []
+        card_value = int(card)  # Converte a carta selecionada para um valor numérico
+
+        for i in range(4):
+            for j in range(4):
+                # Verifica se a célula está vazia
+                if self.board[i][j] == 0:
+                    # Verifica as regras da fileira
+                    if self.is_valid_in_row(i, j, card_value) and self.is_valid_in_column(i, j, card_value):
+                        valid_positions.append((i, j))
+
+        return valid_positions
+
+    def is_valid_in_row(self, i, j, card_value):
+        """Verifica se colocar a carta na linha `i` e coluna `j` é válido com base nas regras da fileira."""
+        row_values = [self.board[i][col] for col in range(4) if self.board[i][col] != 0]
+        if len(row_values) == 0:  # Primeiro cartão pode ser colocado em qualquer posição vazia
+            return True
+        elif len(row_values) == 1:  # Verifica se a soma das duas primeiras cartas é <= 8
+            return (row_values[0] + card_value) <= 8
+        elif len(row_values) == 2:  # Verifica se a soma das três primeiras cartas é <= 9
+            return (row_values[0] + row_values[1] + card_value) <= 9
+        elif len(row_values) == 3:  # Verifica se a soma das quatro cartas é exatamente 10
+            return (row_values[0] + row_values[1] + row_values[2] + card_value) == 10
+        return False
+
+    def is_valid_in_column(self, i, j, card_value):
+        """Verifica se colocar a carta na linha `i` e coluna `j` é válido com base nas regras da coluna."""
+        column_values = [self.board[row][j] for row in range(4) if self.board[row][j] != 0]
+        if len(column_values) == 0:  # Primeiro cartão pode ser colocado em qualquer posição vazia
+            return True
+        elif len(column_values) == 1:  # Verifica se a soma das duas primeiras cartas é <= 8
+            return (column_values[0] + card_value) <= 8
+        elif len(column_values) == 2:  # Verifica se a soma das três primeiras cartas é <= 9
+            return (column_values[0] + column_values[1] + card_value) <= 9
+        elif len(column_values) == 3:  # Verifica se a soma das quatro cartas é exatamente 10
+            return (column_values[0] + column_values[1] + column_values[2] + card_value) == 10
+        return False
+
+    def dark_cell(self, i, j):
+        # Carrega a versão escurecida da imagem
+        dark_image = getattr(self, f"{self.board[i][j]}_dark", None)
+        if not dark_image:
+            original_image = Image.open(f"assets/jogo/{self.board[i][j]}.png")
+            dark_image = original_image.point(lambda p: p * 0.5)  # Reduz o brilho da imagem
+            dark_image = ImageTk.PhotoImage(dark_image)
+            setattr(self, f"{self.board[i][j]}_dark", dark_image)  # Salva como atributo para uso futuro
+
+        # Renderiza a imagem escurecida no canvas
+        self.canvas.create_image(392 + 124 * i, 174 + 124 * j, image=dark_image, anchor=NW)
+        
+    def white_cell(self, i, j):
+        # Carrega a versão clara da imagem
+        white_image = getattr(self, f"{self.board[i][j]}_white", None)
+        if not white_image:
+            original_image = Image.open(f"assets/jogo/{self.board[i][j]}.png")
+            white_image = original_image.point(lambda p: p * 1.3)
+            white_image = ImageTk.PhotoImage(white_image)
+            setattr(self, f"{self.board[i][j]}_white", white_image)
+            
+        # Renderiza a imagem clara no canvas
+        self.canvas.create_image(392 + 124 * i, 174 + 124 * j, image=white_image, anchor=NW)
+
+    def clear_cells(self, positions_to_clear):
+        # Apaga as células no tabuleiro e atualiza a pontuação
+        for i, j in positions_to_clear:
+            self.board[i][j] = 0  # Limpa o valor da célula
+        self.j1_pontos += 4  # Atualiza a pontuação
+        self.render_board()  # Re-renderiza o tabuleiro
                     
     
     
