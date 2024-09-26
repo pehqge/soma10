@@ -1,4 +1,4 @@
-from tkinter import Tk, Frame
+from tkinter import Tk, PhotoImage
 from menu_interface import MenuInterface
 from game_controller import GameController
 import gc
@@ -10,6 +10,8 @@ class MainController:
         self.root.geometry("1280x720")
         self.root.resizable(False, False)
         self.root.title("Soma10")
+        icon = PhotoImage(file="assets/icon.png")
+        self.root.iconphoto(True, icon)
         
         # Inicializa as interfaces 
         self.main_menu = MenuInterface(self)
