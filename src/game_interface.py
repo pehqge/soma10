@@ -22,8 +22,8 @@ class GameInterface(Interface):
         # Menu Jogador 2
         self.ui_tools.load_and_display("j2_card", "assets/jogo/jogador2.png", 900, 40)
         
-        self.ui_tools.write_text(text=f"{self.informacoes["j2_fichas"]} fichas", x=1013, y=195, size=43, color="white", font="font_kid") # qntd de fichas do jogador 2
-        self.ui_tools.write_text(text=f"{self.informacoes["j2_pontos"]} pontos", x=1028, y=92, size=34, color="white", font="font_kid") # qntd de pontos do jogador 2
+        self.ui_tools.write_text(text=f'{self.informacoes["j2_fichas"]} fichas', x=1013, y=195, size=43, color="white", font="font_kid") # qntd de fichas do jogador 2
+        self.ui_tools.write_text(text=f'{self.informacoes["j2_pontos"]} pontos', x=1028, y=92, size=34, color="white", font="font_kid") # qntd de pontos do jogador 2
         
         # Notificacoes do Jogo
         self.display_notification(self.informacoes["notifications"])
@@ -56,7 +56,7 @@ class GameInterface(Interface):
         
         # Inicializa o card e a pontuacao do jogador 1
         self.ui_tools.load_and_display("j1_card", "assets/jogo/jogador1.png", 19, 42)
-        self.ui_tools.write_text(text=f"{points} pontos", x=137, y=92, size=34, color="white", font="font_kid")
+        self.ui_tools.write_text(text=f'{points} pontos', x=137, y=92, size=34, color="white", font="font_kid")
     
         # Renderiza as cartas do jogador 1
         for card_number in range(1,8):
