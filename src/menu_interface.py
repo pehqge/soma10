@@ -17,13 +17,5 @@ class MenuInterface(Interface):
         self.ui_tools.animate_image(logo_id, 286, 136)
         
         # Cria os botões
-        self.ui_tools.create_button("iniciar", 415, 485, self.start_game)
-        self.ui_tools.create_button("tutorial", 642, 485, self.show_tutorial)
-        
-    def start_game(self):
-        self.hide()
-        self.main_controller.start_game()
-        
-    def show_tutorial(self):
-        self.hide()
-        self.main_controller.show_tutorial()
+        self.ui_tools.create_button("iniciar", 415, 485, self.main_controller.start_game)
+        self.ui_tools.create_button("tutorial", 642, 485, self.main_controller.show_tutorial)

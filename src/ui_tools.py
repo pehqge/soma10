@@ -3,13 +3,14 @@ from PIL import Image, ImageDraw, ImageFont, ImageTk
 import math
 
 class UITools:
-    def __init__(self, canvas):
+    def __init__(self, canvas: object):
         self.canvas = canvas
         self.images = {}      # Dicionário para armazenar as imagens carregadas
         self.animations = {}  # Dicionário para controlar as animações
 
-    def load_image(self, key, filepath):
+    def load_image(self, key: str, filepath: str):
         """ Armazena uma imagem no dicionário de imagens. """
+        
         if key in self.images:
             return self.images[key]
         
@@ -17,7 +18,7 @@ class UITools:
         self.images[key] = image
         return image
 
-    def display_image(self, key, x, y, anchor=NW):
+    def display_image(self, key: str, x: int, y: int, anchor=NW):
         """ Exibe uma imagem no canvas usando a chave fornecida."""
         
         image = self.images.get(key)
@@ -27,24 +28,28 @@ class UITools:
         else:
             raise ValueError(f"Imagem com a chave '{key}' não encontrada.")
         
-    def load_and_display(self, key, filepath, x, y, anchor=NW):
+    def load_and_display(self, key: str, filepath: str, x: int, y: int, anchor=NW):
         """ Carrega e exibe uma imagem no canvas. """
     
         image = self.load_image(key, filepath)
         return (image, self.display_image(key, x, y, anchor))
 
-    def animate_image(self, image_id, x, y, amplitude=4, speed=10):
+    def animate_image(self, image_id, x: int, y: int, amplitude=4, speed=10):
         """ Anima uma imagem em movimento vertical usando a função seno. """
+        
         # Armazena o estado da animação dentro do dicionário animations
         # Cada image_id terá seu próprio estado de 'direction'
         if image_id not in self.animations:
             self.animations[image_id] = {'direction': 0}
 
         def animate():
+            """ Função interna que atualiza a posição da imagem repetidamente. """
+            
             # Recupera o estado atual da animação
             state = self.animations[image_id]
             direction = state['direction']
 
+            # Calcula a nova posição da imagem
             offset = amplitude * math.sin(math.radians(direction))
             new_y = y + offset
             self.canvas.coords(image_id, x, new_y)
@@ -61,7 +66,7 @@ class UITools:
         # Inicia a animação
         animate()
 
-    def create_button(self, name, x, y, command):
+    def create_button(self, name: str, x: int, y: int, command: callable):
         """ Cria um botão que controla hover e eventos de clique. """
         
         # Carrega as imagens do botão
@@ -82,14 +87,15 @@ class UITools:
         def on_click(event):
             command()
 
-        self.canvas.tag_bind(button_id, "<Enter>", on_enter)
-        self.canvas.tag_bind(button_id, "<Leave>", on_leave)
-        self.canvas.tag_bind(button_id, "<Button-1>", on_click)
+        # Realiza os tratamentos de evento do botão
+        self.canvas.tag_bind(button_id, "<Enter>", on_enter) # Mouse sobre o botão
+        self.canvas.tag_bind(button_id, "<Leave>", on_leave) # Mouse quando sai do botão
+        self.canvas.tag_bind(button_id, "<Button-1>", on_click) # Clique esquerdo no botão
 
         # Retorna o ID do botão para controle adicional, se necessário
         return button_id
     
-    def create_text_image(self, text, size, color, font, width, height, x_offset=0, y_offset=0):
+    def create_text_image(self, text: str, size: int, color: str, font: str, width: int, height: int, x_offset=0, y_offset=0):
         """ Cria uma imagem Pillow do texto"""
         
         font_path = f"assets/jogo/{font}.ttf"
@@ -103,13 +109,13 @@ class UITools:
         return image
     
 
-    def write_text(self, text, x, y, size, color, font, width=400, height=100, x_offset=0, y_offset=0):
+    def write_text(self, text: str, x: int, y: int, size: int, color: str, font: str, width=400, height=100, x_offset=0, y_offset=0):
         """ Coloca na tela um texto com a fonte fornecida. """
         
         # Cria a imagem do texto
         image = self.create_text_image(text, size, color, font, width, height, x_offset, y_offset)
 
-        # Converte a imagem PIL para ImageTk.PhotoImage
+        # Converte a imagem PIL para ImageTk
         text_image = ImageTk.PhotoImage(image)
 
         # Armazena a imagem para evitar garbage collection
@@ -120,8 +126,8 @@ class UITools:
 
         return image_id
     
-    def create_card(self, card_number, quantity, on_click=None):
-        """ Cria uma ficha com base no número da ficha e quantidade fornecida. """
+    def create_card(self, card_number: int, quantity: int, on_click=None):
+        """ Cria uma ficha com base no número da ficha e quantidade fornecida. (Usado para renderizar as fichas do jogador local) """
         
         card_pos = [(145, 235), (145, 346), (145, 458), (145, 569), (251, 290), (251, 402), (251, 513)] # Posições das fichas
         x, y = card_pos[card_number - 1]
@@ -188,8 +194,9 @@ class UITools:
 
         return image_id
 
-    def create_board_cell(self, card_number, i, j, on_click=None):
+    def create_board_cell(self, card_number: int, i: int, j: int, on_click=None):
         """ Cria uma célula do tabuleiro com base no número da carta e índices fornecidos. """
+        
         # Coordenadas da célula, baseada na posicao no tabuleiro
         x = 454 + 124 * i
         y = 235 + 124 * j
@@ -228,12 +235,14 @@ class UITools:
 
         return cell_id
 
-    def merge_text_to_image(self, key, text, image_path, font_name, font_size, color, x_offset=0, y_offset=0):
+    def merge_text_to_image(self, key: str, text: str, image_path: str, font_name: str, font_size: int, color: str, x_offset=0, y_offset=0):
         """ Adiciona um texto a uma imagem e armazena no dicionário de imagens. """
         
+        # Essa função pode receber um número inteiro ou uma string, se inteiro, converte para string
         if isinstance(text, int):
             text = str(text)
         
+        # Abre a imagem base
         base_image = Image.open(image_path).convert("RGBA")
     
         # Cria um objeto de desenho
@@ -243,13 +252,13 @@ class UITools:
         font_path = f"assets/jogo/{font_name}.ttf"
         font = ImageFont.truetype(font_path, font_size)
 
-        # Escreve o texto na imagem
         
-        if len(text) > 1:
+        if len(text) > 1: # Se o texto tiver mais de um caractere, centraliza
             text_position = (x_offset, y_offset)
         else:
             text_position = (x_offset+6, y_offset)
             
+        # Escreve o texto na imagem
         draw.text(text_position, text, font=font, fill=color)
 
         # Converte a imagem para PhotoImage
@@ -260,8 +269,9 @@ class UITools:
 
         return base_image
     
-    def create_shop_button(self, quantity, command, static=False):
+    def create_shop_button(self, quantity: int, command: callable, static=False):
         """ Cria um botão para a loja de itens. """
+        
         base_image = self.merge_text_to_image("shop", quantity, "assets/jogo/comprar.png", "font_kid", 30, "#FF648D", 145, 21)
         
         if static:
@@ -269,8 +279,9 @@ class UITools:
         else:
             self.create_resizable_button(base_image, 640, 87, command, anchor="center")
         
-    def create_resizable_button(self, image, x, y, command, anchor="center", scale=1.08):
+    def create_resizable_button(self, image: str | Image.Image, x: int, y: int, command: callable, anchor="center", scale=1.08):
         """ Cria um botão com redimensionamento no efeito de hover."""
+        
         # Se a imagem for do tipo string, carrega a imagem do caminho
         if isinstance(image, str):
             try:

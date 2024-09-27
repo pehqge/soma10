@@ -6,6 +6,7 @@ from notification_manager import NotificationManager
 
 class GameController:
     def __init__(self, main_controller):
+        # Inicializa as classes
         self.board = Board()
         self.local_player = Player("local")
         self.remote_player = Player("remote")
@@ -13,13 +14,17 @@ class GameController:
         self.notification_manager = NotificationManager()
         self.interface = GameInterface(main_controller, self)
         
+        # Envia para a interface os dados do jogo
         self.update_interface()
         
     def start(self):
+        """Inicia a partida."""
+        
         # Inicia a interface
+        self.interface.show()
         self.interface.setup()
         
-        # Compra as cartas iniciais
+        # Compra as cartas iniciais para ambos jogadores
         for i in range(3):
             self.local_player.add_card(self.deck.buy_card())
             self.remote_player.add_card(self.deck.buy_card())
@@ -27,14 +32,8 @@ class GameController:
         # Atualiza a interface
         self.update_interface()
             
-    
-    def reset_game(self):
-        self.board.reset_board()
-        self.deck.reset_deck()
-        self.local_player.reset()
-        self.remote_player.reset()
-    
-    def put_card(self, i, j):
+            
+    def put_card(self, i: int, j: int):
         """Coloca uma carta no tabuleiro."""
     
         # Confere se o jogador possui uma carta selecionada
@@ -52,18 +51,24 @@ class GameController:
     def buy_card(self):
         """Compra uma carta."""
         
-        card = self.deck.buy_card()
-        if card is None:
+        card = self.deck.buy_card() # Retira uma carta do deck
+        
+        if card is None: # Se o deck estiver vazio
             self.notify("Baralho vazio.")
+            
         else:
-            self.local_player.add_card(card)
-            self.notify(f"A carta {card} foi comprada.")
+            self.local_player.add_card(card) # Adiciona a carta ao jogador
+            self.notify(f"A carta {card} foi comprada.") # Notifica a compra
             self.update_interface()
     
     def update_interface(self):
+        """Envia para a interface as informações atualizadas do jogo. (Tipo um observer)"""
+        
         informations = {"j2_fichas": len(self.remote_player.cards), "j2_pontos": self.remote_player.score, "j1_pontos": self.local_player.score, "j1_fichas": self.local_player.cards, "shop_size": self.deck.size, "board": self.board.board, "notifications": self.notification_manager.notifications}
         self.interface.update(informations)
         
-    def notify(self, message):
+    def notify(self, message: str):
+        """Notifica o jogador."""
+        
         self.notification_manager.add_notification(message)
         self.update_interface()
