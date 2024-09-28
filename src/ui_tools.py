@@ -1,9 +1,9 @@
-from tkinter import NW
+from tkinter import NW, Canvas
 from PIL import Image, ImageDraw, ImageFont, ImageTk
 import math
 
 class UITools:
-    def __init__(self, canvas: object):
+    def __init__(self, canvas: Canvas):
         self.canvas = canvas
         self.images = {}      # Dicionário para armazenar as imagens carregadas
         self.animations = {}  # Dicionário para controlar as animações
