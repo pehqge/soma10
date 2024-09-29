@@ -89,12 +89,12 @@ O software desenvolvido conta com a arquitetura cliente-servidor distribuído.
 **Requisito não funcional 3 - Modelo de interface gráfica:** A interface gráfica deve ser construída com base nas figuras 1 e 2.
 
 <div style="text-align: center;">
-    <img src="../assets/interface/menu.png">
+    <img src="../src/assets/interface/menu.png">
     <p style="font-style: italic; font-size: 12px;">Figura 1. Interface do menu inicial do jogo.  </p>
 </div>
 
 <div style="text-align: center;">
-    <img src="../assets/interface/jogo.png">
+    <img src="../src/assets/interface/jogo.png">
     <p style="font-style: italic; font-size: 12px;">Figura 2. Interface da partida.  </p>
 </div>
 
@@ -117,14 +117,14 @@ Ao total o baralho conta com 66 fichas enumeradas de 1 a 7, sendo:
 - 2 fichas número 7.
 
 <div style="display: flex; justify-content: center;">
-    <img src="../assets/docs/fichas.png" style="width: 50%;">
+    <img src="../src/assets/docs/fichas.png" style="width: 50%;">
 </div>
 <p style="font-style: italic; font-size: 12px; text-align: center;">Figura 3. Fichas do jogo Soma 10.  </p>
 
 E um tabuleiro com 16 casas interligadas entre si:
 
 <div style="display: flex; justify-content: center;">
-    <img src="../assets/docs/tabuleiro.png" style="width: 30%;">
+    <img src="../src/assets/docs/tabuleiro.png" style="width: 30%;">
 </div>
 <p style="font-style: italic; font-size: 12px; text-align: center;">Figura 4. Tabuleiro do jogo Soma 10.  </p>
 
@@ -138,8 +138,8 @@ E um tabuleiro com 16 casas interligadas entre si:
 Exemplos de jogada:
 
 <div style="display: flex; justify-content: center;">
-    <img src="../assets/docs/jogada1.png" style="width: 30%;" />
-    <img src="../assets/docs/jogada2.png" style="width: 30%;" />
+    <img src="../src/assets/docs/jogada1.png" style="width: 30%;" />
+    <img src="../src/assets/docs/jogada2.png" style="width: 30%;" />
 </div>
 
 <p style="font-style: italic; font-size: 12px; text-align: center;">Figura 5. Exemplos de jogadas válidas.  </p>
