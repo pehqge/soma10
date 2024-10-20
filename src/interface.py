@@ -3,8 +3,11 @@ from tkinter import Frame, Canvas
 from abc import ABC, abstractmethod
 from ui_tools import UITools
 
+
+
 class Interface(ABC):
     def __init__(self, main_controller):
+        
         # Inicializa o MainController e a janela principal
         self.root = main_controller.root
         self.main_controller = main_controller
@@ -13,9 +16,12 @@ class Interface(ABC):
         self.frame = Frame(self.root)
         self.show()
         
+
         # Inicializa a ferramenta de UI
         self.ui_tools = UITools(self.canvas)
 
+
+        
     @abstractmethod
     def setup(self):
         """Configura a interface."""

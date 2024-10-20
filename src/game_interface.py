@@ -1,6 +1,7 @@
 from interface import Interface
 
-class GameInterface(Interface):
+
+class GameInterface(Interface, DogPlayerInterface):
     def __init__(self, main_controller, game_controller):
         super().__init__(main_controller)
         self.game_controller = game_controller
