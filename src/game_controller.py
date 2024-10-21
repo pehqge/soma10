@@ -22,6 +22,7 @@ class GameController:
         
         # Inicia a interface
         self.interface.show()
+        self.interface.start_match() # conexão com o DOG
         self.interface.setup()
         
         # Compra as cartas iniciais para ambos jogadores
