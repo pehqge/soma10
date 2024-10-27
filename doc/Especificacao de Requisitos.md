@@ -59,7 +59,7 @@ O software desenvolvido conta com a arquitetura cliente-servidor distribuído.
 
 ### 3.1 Requisitos funcionais
 
-**Requisito funcional 1 - Iniciar programa:**  Ao ser executado, o programa deve apresentar na primeira interface (menu inicial) um botão para iniciar a partida e um botão de tutorial. O programa deve solicitar conexâo com o DOG Server, utilizando os recursos do DOG.
+**Requisito funcional 1 - Iniciar programa:**  Ao ser executado, o programa deve apresentar na primeira interface (menu inicial) um botão para iniciar a partida e um botão de tutorial. O programa deve solicitar conexâo com o DOG Server, utilizando os recursos do DOG e solicitar ao usuário para ele escrever seu nome.
 
 **Requisito funcional 2 - Mostrar tutorial:** Ao clicar no botão ‘tutorial’ no menu inicial, o programa deve exibir as regras e instruções do jogo em um pop-up dentro da mesma interface.
 
@@ -72,7 +72,7 @@ O software desenvolvido conta com a arquitetura cliente-servidor distribuído.
 
 **Requisito funcional 6 - Verificar soma de 10:** Ao posicionar uma ficha, o programa deve automaticamente verificar se a soma das fichas em uma linha, coluna ou diagonal resulta em 10 e, em caso afirmativo, recolher as 4 fichas dessa linha e somar 4 pontos à pontuação do jogador que fez a última jogada. O programa deve exibir uma mensagem na área “Avisos do Jogo” informando o jogador que fez a pontuação.
 
-**Requisito funcional 7 - Verificar impossibilidade de jogada:** Assim que inicia o turno do jogador, o programa deve verificar se o jogador possui alguma jogada válida com as fichas em sua mão. Se nenhuma jogada for possível, o programa deve verificar se ainda há fichas no baralho. Se houver fichas disponíveis, o programa deve exibir uma mensagem na área “Avisos do Jogo” informando o jogador de que ele deve comprar uma nova ficha. Caso, após a compra, o jogador ainda não tenha uma jogada válida, o programa deve automaticamente passar a vez para o próximo jogador. Se não houver mais fichas no baralho, o programa deve enviar a jogada e encerrar a partida.
+**Requisito funcional 7 - Verificar impossibilidade de jogada:** Assim que inicia o turno do jogador, o programa deve verificar se o jogador possui alguma jogada válida com as fichas em sua mão. Se nenhuma jogada for possível, o programa deve verificar se ainda há fichas no baralho. Se houver fichas disponíveis, o programa deve exibir uma mensagem na área “Avisos do Jogo” informando o jogador de que ele deve comprar uma nova ficha. Após a compra, o programa deve automaticamente passar a vez para o próximo jogador. Se não houver mais fichas no baralho, o programa deve enviar a jogada e encerrar a partida.
 
 **Requisito funcional 8 - Receber determinação de início:** O programa deve poder receber uma notificação de início de partida, originada do Dog Server, a partir da solicitação de ínicio de partida do outro jogador conectado ao servidor. O procedimento de recebimento de notificação de início é similar ao 'Requisito funcional 3 - iniciar jogo'.
 
@@ -126,7 +126,7 @@ Ao total o baralho conta com 66 fichas enumeradas de 1 a 7, sendo:
 - 2 fichas número 7.
 
 <div style="display: flex; justify-content: center;">
-    <img src="../src/assets/docs/fichas.png" style="width: 50%;">
+    <img src="../src/assets/docs/fichas.png" style="width: 40%;">
 </div>
 <p style="font-style: italic; font-size: 12px; text-align: center;">Figura 3. Fichas do jogo Soma 10.  </p>
 
@@ -147,19 +147,19 @@ E um tabuleiro com 16 casas interligadas entre si:
 Exemplos de jogada:
 
 <div style="display: flex; justify-content: center;">
-    <img src="../src/assets/docs/jogada1.png" style="width: 30%;" />
-    <img src="../src/assets/docs/jogada2.png" style="width: 30%;" />
+    <img src="../src/assets/docs/jogada1.png" style="width: 20%;" />
+    <img src="../src/assets/docs/jogada2.png" style="width: 20%;" />
 </div>
 
 <p style="font-style: italic; font-size: 12px; text-align: center;">Figura 5. Exemplos de jogadas válidas.  </p>
 
-5. O jogo termina quando um dos competidores não puder mais realizar uma jogada, considerando as regras de jogada (descritas a seguir). Vence a partida quem possuir o maior número de fichas.
+5. O jogo termina quando um dos competidores não puder mais realizar uma jogada, considerando as regras de jogada (descritas a seguir). Vence a partida quem possuir o maior número de pontuação.
 
 ##### Regras de jogada:
 - Ao inserir a segunda ficha em uma fileira, a soma das duas primeiras fichas deve ser igual ou inferior a 8. Ao adicionar a terceira ficha, a soma das três fichas da fileira deve ser igual ou inferior a 9. 
 
 - O competidor que colocar a quarta ficha, completando a soma de 10, recolhe todas as fichas daquela fileira e as guarda para a contagem final de pontos. Após isso, a vez passa para o próximo jogador.
 
-- Se um jogador não puder realizar uma jogada com as fichas em sua mão, ele deve comprar uma ficha do monte. Caso a nova ficha ainda não permita uma jogada, ele deve passar a vez.
+- Se um jogador não puder realizar uma jogada com as fichas em sua mão, ele deve comprar uma ficha do monte e passar sua vez.
 
 - Quando não houver mais fichas no monte, o jogador realiza sua jogada, se possível, e em seguida passa a vez para o próximo jogador.
