@@ -55,12 +55,12 @@ class GameController:
             qtde = len(self.local_player.cards) - len(self.remote_player.cards)
             for i in range(qtde):
                 card = self.deck.buy_card()
-                self.local_player.add_card(card : Card)
+                self.local_player.add_card(card)
         if len(self.local_player.cards) < len(self.remote_player.cards):
             qtde = len(self.remote_player.cards) - len(self.local_player.cards)
             for i in range(qtde):
                 card = self.deck.buy_card()
-                self.remote_player.add_card(card : Card)
+                self.remote_player.add_card(card)
 
 
     def buy_card(self):
