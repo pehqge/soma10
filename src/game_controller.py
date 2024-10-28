@@ -48,7 +48,21 @@ class GameController:
         self.buy_card() # Compra uma nova carta
         
         self.update_interface() # Atualiza a interface
-        
+
+    def equalize_check(self):
+        """Compara qual player tem mais fichas"""  
+        if len(self.local_player.cards) > len(self.remote_player.cards):
+            qtde = len(self.local_player.cards) - len(self.remote_player.cards)
+            for i in range(qtde):
+                card = self.deck.buy_card()
+                self.local_player.add_card(card : Card)
+        if len(self.local_player.cards) < len(self.remote_player.cards):
+            qtde = len(self.remote_player.cards) - len(self.local_player.cards)
+            for i in range(qtde):
+                card = self.deck.buy_card()
+                self.remote_player.add_card(card : Card)
+
+
     def buy_card(self):
         """Compra uma carta."""
         
