@@ -13,6 +13,7 @@ class GameController:
         self.deck = CardDeck()
         self.notification_manager = NotificationManager()
         self.interface = GameInterface(main_controller, self)
+        self.match_status = None
         
         # Envia para a interface os dados do jogo
         self.update_interface()
@@ -55,12 +56,12 @@ class GameController:
             qtde = len(self.local_player.cards) - len(self.remote_player.cards)
             for i in range(qtde):
                 card = self.deck.buy_card()
-                self.local_player.add_card(card : Card)
+                self.local_player.add_card(card)
         if len(self.local_player.cards) < len(self.remote_player.cards):
             qtde = len(self.remote_player.cards) - len(self.local_player.cards)
             for i in range(qtde):
                 card = self.deck.buy_card()
-                self.remote_player.add_card(card : Card)
+                self.remote_player.add_card(card)
 
 
     def buy_card(self):
@@ -87,3 +88,20 @@ class GameController:
         
         self.notification_manager.add_notification(message)
         self.update_interface()
+
+    def reset_game(self):
+        """Reseta o jogo."""
+        
+        self.board.reset()
+        self.local_player.reset()
+        self.remote_player.reset()
+        self.deck.reset()
+        self.notification_manager.reset()
+        self.update_interface()
+
+
+    def get_status(self):
+        pass
+    """
+    pegar status como jogaaa irregular, vencedor, perdedor, empate
+    """
