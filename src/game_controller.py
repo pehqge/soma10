@@ -13,6 +13,7 @@ class GameController:
         self.deck = CardDeck()
         self.notification_manager = NotificationManager()
         self.interface = GameInterface(main_controller, self)
+        self.match_status = None
         
         # Envia para a interface os dados do jogo
         self.update_interface()
@@ -87,3 +88,20 @@ class GameController:
         
         self.notification_manager.add_notification(message)
         self.update_interface()
+
+    def reset_game(self):
+        """Reseta o jogo."""
+        
+        self.board.reset()
+        self.local_player.reset()
+        self.remote_player.reset()
+        self.deck.reset()
+        self.notification_manager.reset()
+        self.update_interface()
+
+
+    def get_status(self):
+        pass
+    """
+    pegar status como jogaaa irregular, vencedor, perdedor, empate
+    """
