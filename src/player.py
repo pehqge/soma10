@@ -5,7 +5,6 @@ class Player:
         self.identifier = identifier
         self.turn = False
         self.selected_card = None
-        self.won_game = False
         
     def add_card(self, card: int):
         """Adiciona uma carta à mão do jogador."""
@@ -35,18 +34,3 @@ class Player:
         self.cards = []
         self.selected_card = None
         self.turn = False
-
-    def change_shift(self):
-        """Muda o turno do jogador."""
-        
-        self.turn = not self.turn
-
-    def atrribute_victory(self):
-        """Atribui a vitória ao jogador."""
-        
-        pass
-
-    def atrribute_defeat(self):
-        """Atribui a derrota ao jogador."""
-        
-        pass

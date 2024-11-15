@@ -1,21 +1,10 @@
 from interface import Interface
 
-from dog.dog_interface import DogPlayerInterface
-from dog.dog_actor import DogActor
-from tkinter import messagebox  # para conexão com dog
-from tkinter import simpledialog  # para conexão com dog
-
-class GameInterface(Interface, DogPlayerInterface):
+class GameInterface(Interface):
     def __init__(self, main_controller, game_controller):
         super().__init__(main_controller)
         self.game_controller = game_controller
-        
-        # conexão com o dog
-        player_name = simpledialog.askstring(title="Player identification", prompt="Qual o seu nome?")
-        self.dog_server_interface = DogActor()
-        message = self.dog_server_interface.initialize(player_name, self)
-        messagebox.showinfo(message=message)
-
+    
     def setup(self):
         # Carrega e exibe o background
         self.ui_tools.load_and_display("bg", "assets/jogo/fundo.png", 0, 0)
@@ -109,12 +98,3 @@ class GameInterface(Interface, DogPlayerInterface):
         # Reseta a interface
         self.ui_tools.clear_canvas()
         self.setup()
-
-    def start_match(self):
-        start_status = self.dog_server_interface.start_match(2) # invoca o método do DOG e indica a quantidade de jogadores
-        message = start_status.get_message()
-        messagebox.showinfo(message=message)
-
-    def receive_start(self, start_status):
-        message = start_status.get_message()
-        messagebox.showinfo(message=message)

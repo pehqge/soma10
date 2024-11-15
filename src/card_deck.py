@@ -28,8 +28,3 @@ class CardDeck:
         self.deck = [1] * 18 + [2] * 18 + [3] * 14 + [4] * 8 + [5] * 4 + [6] * 2 + [7] * 2
         shuffle(self.deck)
         self.size = len(self.deck)
-
-    def update_deck(self, cards):
-        """ Atualiza deck"""
-        self.deck = cards
-        self.size = len(self.deck)
