@@ -4,6 +4,8 @@ from player import Player
 from card_deck import CardDeck
 from notification_manager import NotificationManager
 from dog.dog_interface import DogPlayerInterface
+from tkinter import messagebox
+from tkinter import simpledialog
 from dog.dog_actor import DogActor
 
 # Match Status
@@ -17,8 +19,6 @@ from dog.dog_actor import DogActor
 
 class GameController(DogPlayerInterface):
     def __init__(self, main_controller):
-        # Recebe o dog_actor criado no menu principal
-        self.dog_actor : DogActor = main_controller.dog_server_interface
         self.main_controller = main_controller
         
         # Inicializa as classes
@@ -30,96 +30,110 @@ class GameController(DogPlayerInterface):
         self.interface = GameInterface(main_controller, self)
         self.match_status = 1
         self.game_over = False
+        self.dog_actor = DogActor()
+        self.connection = False
         
-        # Envia para a interface os dados do jogo
         self.update_interface()
         
-    def start(self, type="local"):
-        """Inicia a partida."""
-        # Build GUI
+    def start(self):
+        """Inicia a partida ao clicar em 'Iniciar Jogo'."""
         self.interface.show()
-        
-        # Request to start match
-        if self.match_status == 1 and type == "local": # Se o jogo não foi iniciado
-            start_status = self.dog_actor.start_match(2) # Tenta conexão com o servidor
-            code = start_status.get_code()
-            message = start_status.get_message()
-            
-            if code == "0" or code == "1": # Se não foi possível conectar
-                self.interface.toggle_waiting_screen(True, message)
-                self.interface.root.after(5000, self.main_controller.show_menu) # volta pro menu
-                return
-
-            players = start_status.get_players()
-            local_id = start_status.get_local_id()
-            local = players[0] if players[0][1] == local_id else players[1]
-            remote = players[0] if players[1][1] == local_id else players[1]
-            
-            # Initialize players
-            self.local_player.update_info(local[0], local[1])
-            self.remote_player.update_info(remote[0], remote[1])
-                
-            # Evaluate who starts
-            if players[0][2] == "1":
-                self.match_status = 3 # Vez do jogador local
-                
-                self.deck.initialize_deck() # Inicializa o deck
-                
-                # Compra as cartas iniciais para ambos jogadores
-                for i in range(3):
-                    self.local_player.add_card(self.deck.buy_card())
-                    self.remote_player.add_card(self.deck.buy_card())
-                
-                    # Manda deck para o adversário
-                self.send_move("dealing_inital_cards")
-                
         self.interface.setup()
-        # Atualiza a interface
-        self.update_interface()
+        self.interface.toggle_waiting_screen(True, "Aguardando outro jogador...")
         
+        # Inicializa o DogActor
+        player_name = simpledialog.askstring(title="Player identification", prompt="Qual o seu nome?")
+        message = self.dog_actor.initialize(player_name, self)
+        messagebox.showinfo(message=message)
+        
+        self.request_start()
+
+    def request_start(self):
+        """Solicita ao servidor o início da partida."""
+        if self.match_status == 1:
+            start_status = self.dog_actor.start_match(2)
+            code = start_status.get_code()
+            
+            if code in ["0", "1"]:
+                # Continua tentando a cada 2 segundos
+                self.interface.root.after(2000, self.request_start)
+            else:
+                self.connection = True
+                self.interface.toggle_waiting_screen(False)
+                self.start_game(start_status)
+
+    def start_game(self, start_status):
+        """Configura o jogo após ambos os jogadores estarem conectados."""
+        print("Partida iniciada!")
+        
+        self.reset_game()
+        players = start_status.get_players()
+        local_id = start_status.get_local_id()
+
+        # Determina qual jogador começa
+        if players[0][1] == local_id:
+            self.match_status = 3  # Vez do jogador local (inicia baralho)
+            self.deck.initialize_deck()
+            
+            for _ in range(3):
+                self.local_player.add_card(self.deck.buy_card())
+                self.remote_player.add_card(self.deck.buy_card())
+            
+            self.send_move("dealing_initial_cards")
+        else:
+            self.match_status = 4  # Vez do jogador remoto
+        
+        self.interface.setup()
+        self.update_interface()
+    
     def receive_start(self, start_status):
+        """Recebe a notificação do início da partida."""
+        print("Partida recebida!")
         self.reset_game()
         
-        players = start_status.get_players()
-        
-        local_id = start_status.get_local_id()
-        local = players[0] if players[0][1] == local_id else players[1]
-        remote = players[0] if players[1][1] == local_id else players[1]
-        
-        self.local_player.update_info(local[0], local[1])
-        self.remote_player.update_info(remote[0], remote[1])
-        
-        # if players[0][2] == "2":
         self.match_status = 4
-        
-        # self.interface.remote_update(self.main_controller.hide_menu)
-        # self.interface.remote_update(self.main_controller.hide_tutorial)
-        # self.interface.remote_update(self.interface.show)
-        # self.interface.remote_update(self.update_interface)
+        self.interface.toggle_waiting_screen(False)
+        self.update_interface()
     
     def receive_move(self, move_data):
         """Recebe o movimento do adversário."""
-        
         move_nature = move_data["nature"]
         
-        if move_nature == "dealing_inital_cards":
+        if move_nature == "dealing_initial_cards":
             self.deck.receive_deck(move_data["deck"])
-        
+            self.update_interface()
     
     def send_move(self, move_nature):
         """Envia o movimento para o adversário."""
-        
-        move_data = {"nature": move_nature, 
-                     "board": self.board.board, 
-                     "oponent_score": self.local_player.score, 
-                     "oponent_cards": self.local_player.cards, 
-                     "deck": self.deck.deck,
-                     "end": self.game_over,
-                     "match_status": "next"}
-        
-        # Envia o estado do jogo para o adversário
+        move_data = {
+            "nature": move_nature,
+            "board": self.board.board,
+            "local_score": self.local_player.score,
+            "local_hand": self.local_player.cards,
+            "deck": self.deck.deck,
+            "end": self.game_over,
+            "match_status": "next"
+        }
         self.dog_actor.send_move(move_data)
     
+    def update_interface(self):
+        informations = {
+            "j2_fichas": len(self.remote_player.cards),
+            "j2_pontos": self.remote_player.score,
+            "j1_pontos": self.local_player.score,
+            "j1_fichas": self.local_player.cards,
+            "shop_size": self.deck.size,
+            "board": self.board.board,
+            "notifications": self.notification_manager.notifications
+        }
+        
+        self.interface.update(informations)
+        
+        if self.interface.empty_cell_tk is not None:
+            self.interface.setup()
+        else:
+            print("Erro: Imagem não carregada corretamente.")
+            
     def put_card(self, i: int, j: int):
         """Coloca uma carta no tabuleiro."""
     
@@ -147,13 +161,6 @@ class GameController(DogPlayerInterface):
             self.local_player.add_card(card) # Adiciona a carta ao jogador
             self.notify(f"A carta {card} foi comprada.") # Notifica a compra
             self.update_interface()
-    
-    def update_interface(self):
-        """Envia para a interface as informações atualizadas do jogo. (Tipo um observer)"""
-
-        informations = {"j2_fichas": len(self.remote_player.cards), "j2_pontos": self.remote_player.score, "j1_pontos": self.local_player.score, "j1_fichas": self.local_player.cards, "shop_size": self.deck.size, "board": self.board.board, "notifications": self.notification_manager.notifications}
-            
-        self.interface.update(informations)
         
     def notify(self, message: str):
         """Notifica o jogador."""
@@ -172,4 +179,4 @@ class GameController(DogPlayerInterface):
         self.match_status = 1
         self.game_over = False
         
-        self.update_interface()
+        # self.update_interface()

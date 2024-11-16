@@ -17,17 +17,10 @@ class MainController:
         icon = PhotoImage(file="assets/icon.png") # Icone da janela
         self.root.iconphoto(True, icon)
         
-        self.dog_server_interface = DogActor()
-        
         # Inicializa as interfaces
         self.main_menu = MenuInterface(self)
         self.tutorial_menu = TutorialInterface(self)
         self.game = GameController(self)
-        
-        # Conexão do jogo com o servidor
-        self.player_name = simpledialog.askstring(title="Player identification", prompt="Qual o seu nome?")
-        message = self.dog_server_interface.initialize(self.player_name, self.game)
-        messagebox.showinfo(message=message)
         
         
     def setup(self):
@@ -49,19 +42,19 @@ class MainController:
         self.main_menu.hide()
         self.tutorial_menu.show()
         
-    def start_game(self, type="local"):
+    def start_game(self):
         """Inicia o jogo."""
         
         self.main_menu.hide()
         self.tutorial_menu.hide()
-        self.game.start(type)
+        self.game.start()
 
     def reset_application(self):
         """Remove o jogo antigo e exibe o menu principal."""
         
         for widget in self.root.winfo_children():
             widget.destroy()
-        gc.collect()
+        # gc.collect()
         
         self.setup()
         
