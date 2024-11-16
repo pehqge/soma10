@@ -110,8 +110,8 @@ class GameInterface(Interface):
         self.informacoes = update_dict # Atualiza as informações do jogo
         
         # Reseta a interface
-        self.ui_tools.clear_canvas()
-        self.setup()
+        self.root.after(0, self.ui_tools.clear_canvas)
+        self.root.after(0, self.setup)
         
     def remote_update(self, callable):
         self.root.after(100, callable)
