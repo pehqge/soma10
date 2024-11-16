@@ -66,14 +66,20 @@ class GameController:
 
     def buy_card(self):
         """Compra uma carta."""
-        
+        """
+        chamar o tributo turn do player para verificar se é o turno do jogador
+        """
+
+        self.get_turn_player()
         card = self.deck.buy_card() # Retira uma carta do deck
         
         if card is None: # Se o deck estiver vazio
             self.notify("Baralho vazio.")
             
         else:
+            
             self.local_player.add_card(card) # Adiciona a carta ao jogador
+    
             self.notify(f"A carta {card} foi comprada.") # Notifica a compra
             self.update_interface()
     
@@ -100,8 +106,45 @@ class GameController:
         self.update_interface()
 
 
-    def get_status(self):
+    def get_match_status(self):
         pass
     """
     pegar status como jogaaa irregular, vencedor, perdedor, empate
     """
+
+    def check_avaible_moves(self):
+
+        """
+        verifica as jogadas válidas para a carta selecionada
+        """
+        pass
+
+    def get_turn_player(self):
+        """
+        retorna o jogador (objeto) da vez
+        """
+        pass
+
+    def start_game(self, start_status):
+        """Configura o jogo após ambos os jogadores estarem conectados."""
+        print("Partida iniciada!")
+        
+        self.reset_game()
+        players = start_status.get_players()
+        local_id = start_status.get_local_id()
+
+        # Determina qual jogador começa
+        if players[0][1] == local_id:
+            self.match_status = 3  # Vez do jogador local (inicia baralho)
+            self.deck.initialize_deck()
+            
+            for _ in range(3):
+                self.local_player.add_card(self.deck.buy_card())
+                self.remote_player.add_card(self.deck.buy_card())
+            
+            self.send_move("dealing_initial_cards")
+        else:
+            self.match_status = 4  # Vez do jogador remoto
+        
+        self.notify("Partida iniciada!")
+        self.update_interface()
