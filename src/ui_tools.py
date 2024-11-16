@@ -95,8 +95,8 @@ class UITools:
         # Retorna o ID do botão para controle adicional, se necessário
         return button_id
     
-    def create_text_image(self, text: str, size: int, color: str, font: str, width: int, height: int, x_offset=0, y_offset=0):
-        """ Cria uma imagem Pillow do texto"""
+    def create_text_image(self, text: str, size: int, color: str, font: str, width: int, height: int, x_offset=0, y_offset=0, center=False):
+        """ Cria uma imagem Pillow do texto """
         
         font_path = f"assets/jogo/{font}.ttf"
         font_obj = ImageFont.truetype(font_path, size)
@@ -104,25 +104,44 @@ class UITools:
         # Cria uma imagem com fundo transparente
         image = Image.new("RGBA", (width, height), (255, 255, 255, 0))
         draw = ImageDraw.Draw(image)
-        draw.text((x_offset, y_offset), text, font=font_obj, fill=color)
 
+        if center:
+            # Calcula o tamanho do texto
+            text_bbox = font_obj.getbbox(text)
+            text_width = text_bbox[2] - text_bbox[0]
+            text_height = text_bbox[3] - text_bbox[1]
+            
+            # Ajusta o deslocamento para centralizar o texto
+            x_offset = (width - text_width) // 2
+            y_offset = (height - text_height) // 2
+
+        draw.text((x_offset, y_offset), text, font=font_obj, fill=color)
+        
         return image
     
 
-    def write_text(self, text: str, x: int, y: int, size: int, color: str, font: str, width=400, height=100, x_offset=0, y_offset=0):
+    def write_text(self, text: str, x: int, y: int, size: int, color: str, font: str, width=400, height=100, x_offset=0, y_offset=0, center=False):
         """ Coloca na tela um texto com a fonte fornecida. """
         
-        # Cria a imagem do texto
-        image = self.create_text_image(text, size, color, font, width, height, x_offset, y_offset)
+        # Cria a imagem do texto com a centralização se necessário
+        image = self.create_text_image(text, size, color, font, width, height, x_offset, y_offset, center)
 
         # Converte a imagem PIL para ImageTk
         text_image = ImageTk.PhotoImage(image)
 
         # Armazena a imagem para evitar garbage collection
-        self.images[x*y] = text_image
+        self.images[x * y] = text_image
+
+        # Se `center=True`, ajusta `x` e `y` para centralizar o texto
+        if center:
+            x -= width // 2
+            y -= height // 2
+            anchor = 'center'
+        else:
+            anchor = NW
 
         # Exibe a imagem no canvas
-        image_id = self.canvas.create_image(x, y, image=text_image, anchor=NW)
+        image_id = self.canvas.create_image(x, y, image=text_image, anchor=anchor)
 
         return image_id
     

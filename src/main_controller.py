@@ -2,6 +2,9 @@ from tkinter import Tk, PhotoImage
 from menu_interface import MenuInterface
 from game_controller import GameController
 from tutorial_interface import TutorialInterface
+from tkinter import messagebox
+from tkinter import simpledialog
+from dog.dog_actor import DogActor
 import gc
 
 class MainController:
@@ -14,7 +17,18 @@ class MainController:
         icon = PhotoImage(file="assets/icon.png") # Icone da janela
         self.root.iconphoto(True, icon)
         
-        self.setup() # Inicializa as interfaces
+        self.dog_server_interface = DogActor()
+        
+        # Inicializa as interfaces
+        self.main_menu = MenuInterface(self)
+        self.tutorial_menu = TutorialInterface(self)
+        self.game = GameController(self)
+        
+        # Conexão do jogo com o servidor
+        self.player_name = simpledialog.askstring(title="Player identification", prompt="Qual o seu nome?")
+        message = self.dog_server_interface.initialize(self.player_name, self.game)
+        messagebox.showinfo(message=message)
+        
         
     def setup(self):
         """ Inicializa as interfaces do jogo."""
@@ -32,21 +46,15 @@ class MainController:
     def show_tutorial(self):
         """Exibe o tutorial."""
         
-        self.hide_all()
+        self.main_menu.hide()
         self.tutorial_menu.show()
         
-    def start_game(self):
+    def start_game(self, type="local"):
         """Inicia o jogo."""
-        
-        self.hide_all()
-        self.game.start()
-    
-    def hide_all(self):
-        """Esconde todas as interfaces."""
         
         self.main_menu.hide()
         self.tutorial_menu.hide()
-        self.game.interface.hide()
+        self.game.start(type)
 
     def reset_application(self):
         """Remove o jogo antigo e exibe o menu principal."""

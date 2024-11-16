@@ -4,6 +4,7 @@ class GameInterface(Interface):
     def __init__(self, main_controller, game_controller):
         super().__init__(main_controller)
         self.game_controller = game_controller
+        self.waiting_screen = False
     
     def setup(self):
         # Carrega e exibe o background
@@ -34,6 +35,19 @@ class GameInterface(Interface):
         
         # Botao de voltar para o menu e resetar game
         self.ui_tools.create_resizable_button("assets/jogo/close.png", 1242, 40, self.main_controller.show_menu)
+        
+        if self.waiting_screen:
+            self.ui_tools.load_and_display("aguardando", "assets/jogo/aguardando.png", 0, 0)
+            self.ui_tools.write_text(text=self.waiting_message, x=1180, y=465, size=42, width=1080, color="white", font="quicksand", center=True)
+            
+    def toggle_waiting_screen(self, on: bool, message=""):
+        """ Exibe a tela de espera. """
+        if on:
+            self.waiting_screen = True
+            self.waiting_message = message
+            self.setup()
+        else:
+            self.waiting_screen = False
         
     def render_board(self):
         """ Renderiza o tabuleiro de jogo. """
@@ -98,3 +112,6 @@ class GameInterface(Interface):
         # Reseta a interface
         self.ui_tools.clear_canvas()
         self.setup()
+        
+    def remote_update(self, callable):
+        self.root.after(100, callable)

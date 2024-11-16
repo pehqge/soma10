@@ -11,3 +11,8 @@ class NotificationManager:
             
         # Insere a nova notificação no início da lista
         self.notifications.insert(0, notification)
+        
+    def reset(self):
+        """Reseta as notificações."""
+        
+        self.notifications = []

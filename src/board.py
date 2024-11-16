@@ -29,7 +29,7 @@ class Board:
         else:
             raise ValueError("Invalid type")
 
-    def reset_board(self):
+    def reset(self):
         """Reinicia o tabuleiro voltando tudo para 0."""
         
         self.board = [[0 for _ in range(4)] for _ in range(4)]
