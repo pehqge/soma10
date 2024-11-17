@@ -33,3 +33,9 @@ class CardDeck:
         """ Atualiza deck"""
         self.deck = cards
         self.size = len(self.deck)
+
+    def empty(self):
+        """ Checa se o baralho está vazio """
+        if len(self.deck) > 0:
+            return False
+        return True

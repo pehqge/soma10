@@ -148,3 +148,12 @@ class GameController:
         
         self.notify("Partida iniciada!")
         self.update_interface()
+
+    def switch_turn(self):
+        """ Troca o turno entre os players """
+        if self.local_player.turn:
+            self.local_player.turn = False
+            self.remote_player.turn = True
+            return
+        self.local_player.turn = True
+        self.remote_player.turn = False
