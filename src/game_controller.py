@@ -95,11 +95,8 @@ class GameController(DogPlayerInterface):
     def receive_start(self, start_status):
         """Recebe a notificação do início da partida para o jogador que estava esperando."""
         print("Partida recebida!")
-    
-        # Cancela o loop de reconexão
-        self.connection = True
 
-        self.notify("Jogador conectado! Partida iniciando...")
+        self.connection = True
 
         self.reset_game()
         self.match_status = 4  # Vez do jogador remoto
@@ -114,7 +111,9 @@ class GameController(DogPlayerInterface):
 
         # Atualiza a interface para o jogador que estava esperando
         self.update_interface()
-    
+        
+        self.notify("Jogador conectado! Partida iniciando...")
+
     def receive_move(self, move_data):
         """Recebe o movimento do adversário."""
         move_nature = move_data["nature"]
@@ -164,6 +163,7 @@ class GameController(DogPlayerInterface):
             "notifications": self.notification_manager.notifications
         }
         self.interface.root.after(0, lambda: self.interface.update(informations))
+        print('self.update_interface: interface atualizada')
             
     def notify(self, message: str):
         """Notifica o jogador."""

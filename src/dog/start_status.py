@@ -17,3 +17,6 @@ class StartStatus:
 
     def get_players(self):
         return self.players
+    
+    def __str__(self):
+        return f'local_id: {self.get_local_id()}\ncode: {self.get_code()}\nmessage: {self.get_message()}\nplayers: {self.get_players()}'
