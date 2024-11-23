@@ -11,23 +11,19 @@ class Board:
     def remove(self, type: str, i: int):
         """Remove uma linha, coluna ou diagonal do tabuleiro."""
         
-        if type == "row": # Remove uma linha
+        if i < 4: # linhas
             self.board[i] = [0, 0, 0, 0]
-            
-        elif type == "column": # Remove uma coluna
-            for row in self.board:
-                row[i] = 0
-                
-        elif type == "1_diagonal": # Remove a diagonal principal
-            for i in range(4):
-                self.board[i][i] = 0
-        
-        elif type == "2_diagonal": # Remove a diagonal secundária
-            for i in range(4):
-                self.board[i][3-i] = 0
-                
-        else:
-            raise ValueError("Invalid type")
+        elif i < 8: # colunas
+            for row in range(4):
+                col = i - 4
+                self.board[row][col] = 0
+        else: # diagonais
+            if i == 8: # diagonal principal
+                for x in range(4):
+                    self.board[x][x] = 0
+            if i == 9: # diagonal secundaria
+                for x in range(4):
+                    self.board[x][3 - x] = 0
 
     def reset(self):
         """Reinicia o tabuleiro voltando tudo para 0."""
