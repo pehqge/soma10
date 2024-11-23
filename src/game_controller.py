@@ -225,6 +225,14 @@ class GameController(DogPlayerInterface):
         
         self.switch_turn()
         self.send_move("put_card")
+
+    def attribute_winner(self):
+        if self.local_player.score > self.remote_player.score:
+            self.local_player.won = True
+            self.remote_player.won = False
+        else:
+            self.local_player = False       
+            self.remote_player.won = True
     
     def check_available_moves(self) -> list:
         

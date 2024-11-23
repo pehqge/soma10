@@ -6,6 +6,7 @@ class Player:
         self.id = id
         self.turn = False
         self.selected_card = None
+        self.won = None
         
     def update_info(self, name: str, id: str):
         self.name = name
