@@ -289,7 +289,7 @@ class GameController(DogPlayerInterface):
                     self.update_interface()
                 else:
                     self.match_status = 2 # status game over
-                    # self.attribute_winner()
+                    self.attribute_winner()
         
         if not system_call:
 
@@ -310,6 +310,6 @@ class GameController(DogPlayerInterface):
                     else:
                         self.notify("Baralho está vazio!")
                         self.match_status = 2 # status game over
-                        # self.attribute_winner()
+                        self.attribute_winner()
 
             
