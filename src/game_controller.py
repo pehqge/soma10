@@ -231,7 +231,7 @@ class GameController(DogPlayerInterface):
             self.local_player.won = True
             self.remote_player.won = False
         else:
-            self.local_player = False       
+            self.local_player.won = False       
             self.remote_player.won = True
     
     def check_available_moves(self) -> list:
