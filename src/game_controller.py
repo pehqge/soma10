@@ -234,7 +234,7 @@ class GameController(DogPlayerInterface):
             self.local_player.won = False       
             self.remote_player.won = True
     
-    def check_available_moves(self) -> list:
+    def check_available_moves(self, card) -> list:
         
         lines = [False for _ in range(10)]
         for i in range(10):
@@ -255,13 +255,13 @@ class GameController(DogPlayerInterface):
                 case 0:
                     lines[i] = True
                 case 1:
-                    if sum(card for card in cards if card is not None) + self.local_player.selected_card <= 8:
+                    if sum(card for card in cards if card is not None) + card <= 8:
                         lines[i] = True
                 case 2:
-                    if sum(card for card in cards if card is not None) + self.local_player.selected_card <= 9:
+                    if sum(card for card in cards if card is not None) + card <= 9:
                         lines[i] = True
                 case 3:
-                    if sum(card for card in cards if card is not None) + self.local_player.selected_card == 10:
+                    if sum(card for card in cards if card is not None) + card == 10:
                         lines[i] = True
                 case _:
                     lines[i] = False
@@ -297,8 +297,13 @@ class GameController(DogPlayerInterface):
                 self.notify("Aguarde seu turno para comprar uma carta!")
 
             if self.local_player.turn: # checa se eh o turno do local_player
-                available_moves = self.check_available_moves()
-                if any(available_moves):
+                is_any_move_available = False
+                for card in self.local_player.cards:
+                    available_moves = self.check_available_moves(card)
+                    if any(available_moves):
+                        is_any_move_available = True
+                        
+                if is_any_move_available:
                     self.notify("Ainda há jogadas disponíveis, não é possível comprar cartas")
                 else:
                     if self.deck.size:
