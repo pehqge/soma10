@@ -48,6 +48,14 @@ class GameController(DogPlayerInterface):
         self.notify("Conectando ao servidor...")
         self.request_start()
 
+    def switch_turn(self):
+        if self.local_player.turn:
+            self.local_player.turn = False
+            self.remote_player.turn = True
+        else:
+            self.local_player.turn = True
+            self.remote_player.turn = False
+
     def request_start(self):
         """Solicita ao servidor o início da partida."""
         # Se o jogo já está conectado, não continue tentando
@@ -114,16 +122,28 @@ class GameController(DogPlayerInterface):
         
         self.notify("Jogador conectado! Partida iniciando...")
 
+    def equalize_check(self):
+        """checa se o player local tem menos cartas, se sim, compra mais"""  
+        if len(self.local_player.cards) < len(self.remote_player.cards):
+            qtde = len(self.remote_player.cards) - len(self.local_player.cards)
+            for i in range(qtde):
+                card = self.deck.buy_card()
+                self.local_player.add_card(card)
+
     def receive_move(self, move_data):
         """Recebe o movimento do adversário."""
         move_nature = move_data["nature"]
-        
+
+        self.notify(f"receive move, nature: {move_nature}")
+
+        self.switch_turn()
+
         if move_nature == "dealing_initial_cards":
             self.deck.receive_deck(move_data["deck"])
+            self.local_player.cards = move_data["initial_deck"]
             self.update_interface()
             
         elif move_nature == "normal_play":
-            print("recebido")
             self.board.board = move_data["board"]
             self.local_player.score = move_data["local_score"]
             self.local_player.cards = move_data["local_hand"]
@@ -133,7 +153,13 @@ class GameController(DogPlayerInterface):
             self.update_interface()
         
         elif move_nature == "buy_card":
-            self.deck.deck = move_data["deck"]
+            self.deck.receive_deck(move_data["deck"])
+            self.remote_player.cards.append(None) # adiciona carta nula para atualizar contagem
+            print("local player deck size", self.local_player.cards)
+            print("remote player deck size", self.remote_player.cards)
+            self.equalize_check()
+            self.update_interface()
+
             
         # Verificar se a interface ainda está disponível antes de atualizar
         if self.interface.root and self.interface.root.winfo_exists():
@@ -144,8 +170,9 @@ class GameController(DogPlayerInterface):
         move_data = {
             "nature": move_nature,
             "board": self.board.board,
+            "player_deck_size": len(self.local_player.cards),
             "local_score": self.local_player.score,
-            "local_hand": self.local_player.cards,
+            "initial_deck": self.remote_player.cards,
             "deck": self.deck.deck,
             "end": self.game_over,
             "match_status": "next"
@@ -196,18 +223,28 @@ class GameController(DogPlayerInterface):
         
         self.update_interface() # Atualiza a interface
         
+        self.switch_turn()
         self.send_move("put_card")
         
-    def buy_card(self):
+    def buy_card(self, system_call=False):
         """Compra uma carta."""
         
-        card = self.deck.buy_card() # Retira uma carta do deck
-        
-        if card is None: # Se o deck estiver vazio
-            self.notify("Baralho vazio.")
+        if self.local_player.turn:
+
+            card = self.deck.buy_card() # Retira uma carta do deck
             
-        else:
-            self.local_player.add_card(card) # Adiciona a carta ao jogador
-            self.notify(f"A carta {card} foi comprada.") # Notifica a compra
-            self.update_interface()
+            if card is None: # Se o deck estiver vazio
+                self.notify("Baralho vazio.")
+                
+            else:
+                self.local_player.add_card(card) # Adiciona a carta ao jogador
+                self.notify(f"A carta {card} foi comprada.") # Notifica a compra
+                self.update_interface()
+            
+            if not system_call:
+                self.send_move("buy_card")
+                self.switch_turn() 
+
+        else:            
+            self.notify("Aguarde seu turno para comprar uma carta!")
         
