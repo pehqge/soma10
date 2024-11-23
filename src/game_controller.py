@@ -225,26 +225,52 @@ class GameController(DogPlayerInterface):
         
         self.switch_turn()
         self.send_move("put_card")
+    
+    def check_available_moves() -> list:
+        return [True]
         
     def buy_card(self, system_call=False):
         """Compra uma carta."""
-        
-        if self.local_player.turn:
 
-            card = self.deck.buy_card() # Retira uma carta do deck
-            
-            if card is None: # Se o deck estiver vazio
-                self.notify("Baralho vazio.")
-                
-            else:
-                self.local_player.add_card(card) # Adiciona a carta ao jogador
-                self.notify(f"A carta {card} foi comprada.") # Notifica a compra
+        if system_call:
+            if self.deck.size: # checa se o baralho tem cartas
+                card = self.deck.buy_card()
+                self.local_player.add_card(card)
                 self.update_interface()
-            
-            if not system_call:
-                self.send_move("buy_card")
-                self.switch_turn() 
-
-        else:            
-            self.notify("Aguarde seu turno para comprar uma carta!")
+            if not self.deck.size:
+                self.notify("Baralho está vazio!")
+                
+                is_any_move_available = False
+                for card in self.local_player.cards:
+                    available_moves = self.check_available_moves(card)
+                    if any(available_moves):
+                        is_any_move_available = True
+                
+                if is_any_move_available:
+                    self.update_interface()
+                else:
+                    self.match_status = 2 # status game over
+                    # self.attribute_winner()
         
+        if not system_call:
+
+            if not self.local_player.turn:
+                self.notify("Aguarde seu turno para comprar uma carta!")
+
+            if self.local_player.turn: # checa se eh o turno do local_player
+                available_moves = self.check_available_moves()
+                if any(available_moves):
+                    self.notify("Ainda há jogadas disponíveis, não é possível comprar cartas")
+                else:
+                    if self.deck.size:
+                        card = self.deck.buy_card()
+                        self.local_player.add_card(card)
+                        self.send_move("buy_card")
+                        self.switch_turn() 
+                        self.update_interface()
+                    else:
+                        self.notify("Baralho está vazio!")
+                        self.match_status = 2 # status game over
+                        # self.attribute_winner()
+
+            
