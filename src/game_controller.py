@@ -135,6 +135,7 @@ class GameController(DogPlayerInterface):
         move_nature = move_data["nature"]
 
         self.notify(f"receive move, nature: {move_nature}")
+        print(f"receive move, nature: {move_nature}")
 
         self.switch_turn()
 
@@ -143,10 +144,11 @@ class GameController(DogPlayerInterface):
             self.local_player.cards = move_data["initial_deck"]
             self.update_interface()
             
-        elif move_nature == "normal_play":
+        elif move_nature == "put_card":
+            print('receive put card')
+            print(move_data['board'])
             self.board.board = move_data["board"]
-            self.local_player.score = move_data["local_score"]
-            self.local_player.cards = move_data["local_hand"]
+            self.remote_player.score = move_data["local_score"]
             self.deck.deck = move_data["deck"]
             self.game_over = move_data["end"]
             self.match_status = 3
@@ -207,23 +209,48 @@ class GameController(DogPlayerInterface):
         self.match_status = 1
         self.game_over = False
         
+    def verify_lines_sum(self):
+        """checa se alguma linha, coluna ou diagonal somou 10"""
+        points = 0
+        for i in range(10):
+            if i < 4: # linhas
+                cards = self.board.board[i]
+            elif i < 8: # colunas
+                col_i = i - 4
+                cards = [ self.board.board[row_i][col_i] for row_i in range(4) ]
+            else: # diagonais
+                if i == 8: # diagonal principal
+                    cards = [ self.board.board[x][x] for x in range(4) ]
+                if i == 9: # diagonal secundaria
+                    cards = [ self.board.board[x][3 - x] for x in range(4) ]
+            
+            total_cards_in_line = sum([1 for card in cards if card != 0])
+            if total_cards_in_line == 4 and sum(cards) == 10:
+                points += 4
+                self.board.remove(i) # remove linha do tabuleiro
+        
+        self.local_player.add_score(points)
+        
+        return points
+
         
     def put_card(self, i: int, j: int):
         """Coloca uma carta no tabuleiro."""
     
         # Confere se o jogador possui uma carta selecionada
-        if self.local_player.selected_card is None:
+        if not self.local_player.selected_card:
             return
         
         card = self.local_player.selected_card # Pega a carta selecionada
         self.board.put_card(card, i, j) # Coloca a carta no tabuleiro
         self.local_player.remove_card(card) # Remove a carta do jogador
+
+        self.verify_lines_sum()
         
-        self.buy_card() # Compra uma nova carta
+        self.local_player.select_card = None
         
+        self.switch_turn
         self.update_interface() # Atualiza a interface
-        
-        self.switch_turn()
         self.send_move("put_card")
 
     def attribute_winner(self):
@@ -296,15 +323,15 @@ class GameController(DogPlayerInterface):
             if not self.local_player.turn:
                 self.notify("Aguarde seu turno para comprar uma carta!")
 
-            if self.local_player.turn: # checa se eh o turno do local_player
+            else: # checa se eh o turno do local_player
                 is_any_move_available = False
                 for card in self.local_player.cards:
                     available_moves = self.check_available_moves(card)
                     if any(available_moves):
                         is_any_move_available = True
-                        
+
                 if is_any_move_available:
-                    self.notify("Ainda há jogadas disponíveis, não é possível comprar cartas")
+                    self.notify("Ainda ha jogadas disponíveis, não eh possivel comprar cartas")
                 else:
                     if self.deck.size:
                         card = self.deck.buy_card()
