@@ -32,6 +32,7 @@ class GameController(DogPlayerInterface):
         self.game_over = False
         self.dog_actor = DogActor()
         self.connection = False
+        self.valid_moves = [True] * 10
         
         self.update_interface()
         
@@ -189,7 +190,8 @@ class GameController(DogPlayerInterface):
             "j1_fichas": self.local_player.cards,
             "shop_size": self.deck.size,
             "board": self.board.board,
-            "notifications": self.notification_manager.notifications
+            "notifications": self.notification_manager.notifications,
+            "valid_moves": self.valid_moves
         }
         self.interface.root.after(0, lambda: self.interface.update(informations))
         print('self.update_interface: interface atualizada')
@@ -247,11 +249,27 @@ class GameController(DogPlayerInterface):
 
         self.verify_lines_sum()
         
-        self.local_player.select_card = None
+        self.local_player.selected_card = None
         
         self.switch_turn
+        self.buy_card(True)
         self.update_interface() # Atualiza a interface
         self.send_move("put_card")
+        
+    def select_card(self, value):
+        
+        self.interface.render_board()
+        
+        # Define a carta selecionada
+        self.local_player.selected_card = value
+        # Checa os movimentos válidos para a carta selecionada
+        valid_moves = self.check_available_moves(value)
+        print(valid_moves)
+        
+        for i in range(10):
+            if valid_moves[i] == False:
+                self.interface.block_line(i)
+
 
     def attribute_winner(self):
         if self.local_player.score > self.remote_player.score:

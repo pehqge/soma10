@@ -57,8 +57,35 @@ class GameInterface(Interface):
         # Para cada célula do tabuleiro, renderiza uma célula
         for i in range(4):
             for j in range(4):
-                on_click = lambda event, value1=i, value2=j: self.game_controller.put_card(value1, value2) # Função que será ativada quando a carta for clicada
+                on_click = (lambda event, value1=i, value2=j: 
+                    self.game_controller.put_card(value1, value2))
+                
                 self.ui_tools.create_board_cell(card_number=board[i][j], i=i, j=j, on_click=on_click)
+                
+                    
+    def block_line(self, i):
+        """ 0 <= i <= 3 : Bloqueia a linha i do tabuleiro. 
+            4 <= i <= 7 : Bloqueia a coluna i-4 do tabuleiro. 
+            8 : Bloqueia a diagonal principal do tabuleiro. 
+            9 : Bloqueia a diagonal secundária do tabuleiro. """
+    
+        board = self.informacoes["board"]
+        
+        if i < 4:
+            for j in range(4):
+                    self.ui_tools.dark_cell(card_number=board[i][j], i=i, j=j)
+                    
+        elif i < 8:
+            for j in range(4):
+                    self.ui_tools.dark_cell(card_number=board[j][i-4], i=j, j=i-4)
+                    
+        elif i == 8:
+            for j in range(4):
+                    self.ui_tools.dark_cell(card_number=board[j][j], i=j, j=j)
+                    
+        elif i == 9:
+            for j in range(4):
+                    self.ui_tools.dark_cell(card_number=board[j][3-j], i=j, j=3-j)
         
     def render_local_player(self):
         """ Renderiza o menu do jogador local. """
@@ -75,7 +102,7 @@ class GameInterface(Interface):
             count = cards.count(card_number) # Quantidade daquela ficha no baralho do jogador
 
             if count > 0: # Se tiver pelo menos uma carta, a carta é clicável
-                on_click = lambda event, value=card_number: self.game_controller.local_player.select_card(value) # Função que será ativada quando a carta for clicada
+                on_click = lambda event, value=card_number: self.game_controller.select_card(value) # Função que será ativada quando a carta for clicada
                 
             else: # Se não tiver carta daquele número, ela não é clicável
                 on_click = None

@@ -10,11 +10,10 @@ class UITools:
         self.animations = {}  # Dicionário para controlar as animações
 
     def safe_execute(self, func, *args, **kwargs):
-        """Executa uma função no thread principal do Tkinter de forma segura."""
-        if threading.current_thread() is threading.main_thread():
+        """Executa métodos de forma segura, verificando a existência do canvas."""
+        if hasattr(self, 'canvas') and self.canvas.winfo_exists():
             return func(*args, **kwargs)
-        else:
-            return self.canvas.after(0, lambda: func(*args, **kwargs))
+        return None
 
     def load_image(self, key: str, filepath: str):
         """Armazena uma imagem no dicionário de imagens."""
@@ -232,6 +231,39 @@ class UITools:
                 self.canvas.tag_bind(image_id, "<Button-1>", on_click)
 
         return image_id
+    
+    def dark_cell(self, card_number: int, i: int, j: int):
+        """
+        Escurece uma célula do tabuleiro com base no valor da posição no tabuleiro.
+        
+        Parâmetros:
+            i (int): Linha da célula.
+            j (int): Coluna da célula.
+            card_number (int): Valor da posição no tabuleiro (usado para identificar a imagem).
+        """
+        
+        if card_number != 0:
+            return
+        
+        # Verifica se a versão escurecida já foi carregada
+        dark_image_key = f"dark_{card_number}"
+        if dark_image_key not in self.images:
+            # Carrega a imagem original
+            original_image = Image.open(f"assets/jogo/{card_number}.png").convert("RGBA")
+            # Reduz o brilho da imagem
+            dark_image = original_image.point(lambda p: p * 0.5)
+            # Converte a imagem para o formato compatível com Tkinter
+            dark_image_tk = ImageTk.PhotoImage(dark_image)
+            # Armazena a imagem escurecida em cache
+            self.images[dark_image_key] = dark_image_tk
+        else:
+            # Usa a imagem escurecida em cache
+            dark_image_tk = self.images[dark_image_key]
+            
+        x = 454 + 124 * i
+        y = 235 + 124 * j
+
+        self.safe_execute(self.canvas.create_image, x, y, image=dark_image_tk, anchor="center")
 
     def create_board_cell(self, card_number: int, i: int, j: int, on_click=None):
         """Cria uma célula do tabuleiro com base no número da carta e índices fornecidos."""
@@ -366,6 +398,6 @@ class UITools:
         return image_id
         
     def clear_canvas(self):
-        """Limpa o canvas."""
-        
-        self.safe_execute(self.canvas.delete, "all")
+        """Remove todos os elementos do canvas, se ele existir."""
+        if self.canvas.winfo_exists():
+            self.safe_execute(self.canvas.delete, "all")
