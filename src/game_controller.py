@@ -226,8 +226,39 @@ class GameController(DogPlayerInterface):
         self.switch_turn()
         self.send_move("put_card")
     
-    def check_available_moves() -> list:
-        return [True]
+    def check_available_moves(self) -> list:
+        
+        lines = [False for _ in range(10)]
+        for i in range(10):
+            if i < 4: # linhas
+                cards = self.board.board[i]
+            elif i < 8: # colunas
+                col_i = i - 4
+                cards = [ self.board.board[row_i][col_i] for row_i in range(4) ]
+            else: # diagonais
+                if i == 8: # diagonal principal
+                    cards = [ self.board.board[x][x] for x in range(4) ]
+                if i == 9: # diagonal secundaria
+                    cards = [ self.board.board[x][3 - x] for x in range(4) ]
+
+            card_count = sum([1 for card in cards if card != 0])
+
+            match card_count:
+                case 0:
+                    lines[i] = True
+                case 1:
+                    if sum(card for card in cards if card is not None) + self.local_player.selected_card <= 8:
+                        lines[i] = True
+                case 2:
+                    if sum(card for card in cards if card is not None) + self.local_player.selected_card <= 9:
+                        lines[i] = True
+                case 3:
+                    if sum(card for card in cards if card is not None) + self.local_player.selected_card == 10:
+                        lines[i] = True
+                case _:
+                    lines[i] = False
+                            
+        return lines
         
     def buy_card(self, system_call=False):
         """Compra uma carta."""
