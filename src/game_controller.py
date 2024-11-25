@@ -259,13 +259,16 @@ class GameController(DogPlayerInterface):
         
     def select_card(self, value):
         
+        if not self.local_player.turn:
+            self.notify("Aguarde seu turno para selecionar uma carta!")
+            return
+
         self.interface.render_board()
         
         # Define a carta selecionada
         self.local_player.selected_card = value
         # Checa os movimentos válidos para a carta selecionada
         valid_moves = self.check_available_moves(value)
-        print(valid_moves)
         
         for i in range(10):
             if valid_moves[i] == False:
