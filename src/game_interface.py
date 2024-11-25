@@ -127,8 +127,29 @@ class GameInterface(Interface):
             else:
                 color = "#f6a7be"
                 
+            # Se a notificação for muito grande, quebra ela em várias linhas
+            if len(notification) > 20:
+                split = notification.split(" ")
+                notification = ""
+                
+                tam_linha = 0
+                for i in range(len(split)):
+                    if tam_linha > 20:
+                        notification += "\n"
+                        tam_linha = 0
+                        
+                    notification += split[i] + " "
+                    tam_linha += len(split[i]) + 1
+            
+            # Se a notificação for muito grande para caber na tela, para de exibir
+            if y + notification.count("\n") * 24 > 610:
+                break    
+            
             # Escreve o texto da notificação
-            self.ui_tools.write_text(text=notification, x=x, y=y, size=24, color=color, font="font_kid")
+            self.ui_tools.write_text(text=notification, x=x, y=y, size=24, color=color, font="kg font")
+            
+            if "\n" in notification:
+                y += notification.count("\n") * 24
             y += 24 # Incrementa a posição Y para a próxima notificação
     
     def update(self, update_dict: dict):
