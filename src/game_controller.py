@@ -188,7 +188,7 @@ class GameController(DogPlayerInterface):
             "j2_pontos": self.remote_player.score,
             "j1_pontos": self.local_player.score,
             "j1_fichas": self.local_player.cards,
-            "shop_size": self.deck.size,
+            "shop_size": len(self.deck.deck),
             "board": self.board.board,
             "notifications": self.notification_manager.notifications,
             "valid_moves": self.valid_moves
@@ -226,6 +226,7 @@ class GameController(DogPlayerInterface):
                 if i == 9: # diagonal secundaria
                     cards = [ self.board.board[x][3 - x] for x in range(4) ]
             
+
             total_cards_in_line = sum([1 for card in cards if card != 0])
             if total_cards_in_line == 4 and sum(cards) == 10:
                 points += 4
@@ -251,8 +252,8 @@ class GameController(DogPlayerInterface):
         
         self.local_player.selected_card = None
         
-        self.switch_turn
-        self.buy_card(True)
+        self.switch_turn()
+        self.buy_card(system_call=True)
         self.update_interface() # Atualiza a interface
         self.send_move("put_card")
         
@@ -317,11 +318,12 @@ class GameController(DogPlayerInterface):
         """Compra uma carta."""
 
         if system_call:
-            if self.deck.size: # checa se o baralho tem cartas
+            if len(self.deck.deck) > 0: # checa se o baralho tem cartas
                 card = self.deck.buy_card()
                 self.local_player.add_card(card)
                 self.update_interface()
-            if not self.deck.size:
+                self.notify("Carta comprada automaticamente!")
+            else:
                 self.notify("Baralho está vazio!")
                 
                 is_any_move_available = False
@@ -329,6 +331,7 @@ class GameController(DogPlayerInterface):
                     available_moves = self.check_available_moves(card)
                     if any(available_moves):
                         is_any_move_available = True
+                        break
                 
                 if is_any_move_available:
                     self.update_interface()
@@ -351,7 +354,7 @@ class GameController(DogPlayerInterface):
                 if is_any_move_available:
                     self.notify("Ainda ha jogadas disponíveis, não eh possivel comprar cartas")
                 else:
-                    if self.deck.size:
+                    if len(self.deck.deck) > 0:
                         card = self.deck.buy_card()
                         self.local_player.add_card(card)
                         self.send_move("buy_card")

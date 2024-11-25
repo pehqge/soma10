@@ -8,7 +8,7 @@ class Board:
         
         self.board[i][j] = card_number
         
-    def remove(self, type: str, i: int):
+    def remove(self, i: int):
         """Remove uma linha, coluna ou diagonal do tabuleiro."""
         
         if i < 4: # linhas
