@@ -2,10 +2,6 @@ from tkinter import Tk, PhotoImage
 from menu_interface import MenuInterface
 from game_controller import GameController
 from tutorial_interface import TutorialInterface
-from tkinter import messagebox
-from tkinter import simpledialog
-from dog.dog_actor import DogActor
-import gc
 
 class MainController:
     def __init__(self):
@@ -47,14 +43,13 @@ class MainController:
         
         self.main_menu.hide()
         self.tutorial_menu.hide()
-        self.game.start()
+        self.game.start_match()
 
     def reset_application(self):
         """Remove o jogo antigo e exibe o menu principal."""
         
         for widget in self.root.winfo_children():
             widget.destroy()
-        # gc.collect()
         
         self.setup()
         

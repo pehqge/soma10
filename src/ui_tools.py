@@ -244,7 +244,7 @@ class UITools:
         
         if card_number != 0:
             return
-        
+
         # Verifica se a versão escurecida já foi carregada
         dark_image_key = f"dark_{card_number}"
         if dark_image_key not in self.images:

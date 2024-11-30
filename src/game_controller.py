@@ -28,15 +28,40 @@ class GameController(DogPlayerInterface):
         self.local_player = Player("Jogador 1", 1)
         self.remote_player = Player("Jogador 2", 2)
         self.interface = GameInterface(main_controller, self)
+        
         self.match_status = 1
-        self.game_over = False
         self.dog_actor = DogActor()
-        self.connection = False
-        self.valid_moves = [True] * 10
         
         self.update_interface()
         
-    def start(self):
+        
+    def debug_start(self):
+        """Inicia o jogo em modo de depuração."""
+        self.interface.show()
+        self.interface.setup()
+        
+        self.match_status = 3
+        self.local_player.update_info(["Jogador 1", 1])
+        self.local_player.turn = True
+        self.debug = True
+        
+        self.deck.initialize_deck()
+        
+        for _ in range(3):
+            self.local_player.add_card(self.deck.buy_card())
+            self.remote_player.add_card(self.deck.buy_card())
+            
+        self.update_interface()
+        
+    def switch_turn(self):
+        if self.local_player.turn:
+            self.local_player.turn = False
+            self.remote_player.turn = True
+        else:
+            self.local_player.turn = True
+            self.remote_player.turn = False
+        
+    def start_match(self):
         """Inicia a partida ao clicar em 'Iniciar Jogo'."""
         self.interface.show()
         self.interface.setup()
@@ -46,57 +71,58 @@ class GameController(DogPlayerInterface):
         message = self.dog_actor.initialize(player_name, self)
         self.notify(message)
         
+        if message == "Você está sem conexão":
+            self.main_controller.show_menu()
+        
         self.notify("Conectando ao servidor...")
-        self.request_start()
+        
+        self.request_connection()
 
-    def switch_turn(self):
-        if self.local_player.turn:
-            self.local_player.turn = False
-            self.remote_player.turn = True
-        else:
-            self.local_player.turn = True
-            self.remote_player.turn = False
 
-    def request_start(self):
+    def request_connection(self):
         """Solicita ao servidor o início da partida."""
-        # Se o jogo já está conectado, não continue tentando
-        if self.connection:
-            return
 
         if self.match_status == 1:
             start_status = self.dog_actor.start_match(2)
             code = start_status.get_code()
             
-            if code in ["0", "1"]:
+            if code in ["0", "1"] and self.match_status == 1:
                 # Exibe notificação informando que está tentando conectar
                 self.notify("Aguardando outro jogador...")
+                
                 # Tenta novamente em 2 segundos se ainda não estiver conectado
-                self.interface.root.after(2000, self.request_start)
+                self.interface.root.after(2000, self.request_connection)
+                
             else:
-                self.connection = True
                 self.notify("Jogador encontrado! Partida iniciando...")
-                self.start_game(start_status)
+                self.initialize_game(start_status)
 
-    def start_game(self, start_status):
+    def initialize_game(self, start_status):
         """Configura o jogo após ambos os jogadores estarem conectados."""
         print("Partida iniciada!")
-        
+
         self.reset_game()
+        
         players = start_status.get_players()
         local_id = start_status.get_local_id()
+        
+        local_info = self.get_local_player(players, local_id)
+        remote_info = self.get_remote_player(players, local_id)
+        
+        self.local_player.update_info(local_info)
+        self.remote_player.update_info(remote_info)
 
-        # Determina qual jogador começa
-        if players[0][1] == local_id:
-            self.match_status = 3  # Vez do jogador local (inicia baralho)
-            self.deck.initialize_deck()
-            
-            for _ in range(3):
-                self.local_player.add_card(self.deck.buy_card())
-                self.remote_player.add_card(self.deck.buy_card())
-            
-            self.send_move("dealing_initial_cards")
-        else:
-            self.match_status = 4  # Vez do jogador remoto
+        self.set_match_status(3)  # Vez do jogador local 
+        self.local_player.turn = True
+        
+        # Inicia o baralho e distribui as cartas
+        self.deck.initialize_deck()
+        
+        for _ in range(3):
+            self.local_player.add_card(self.deck.buy_card())
+            self.remote_player.add_card(self.deck.buy_card())
+        
+        self.send_move("dealing_initial_cards")
         
         self.notify("Partida iniciada!")
         self.update_interface()
@@ -105,79 +131,105 @@ class GameController(DogPlayerInterface):
         """Recebe a notificação do início da partida para o jogador que estava esperando."""
         print("Partida recebida!")
 
-        self.connection = True
-
         self.reset_game()
-        self.match_status = 4  # Vez do jogador remoto
+        
+        self.set_match_status(4)
 
         players = start_status.get_players()
         local_id = start_status.get_local_id()
-        local = players[0] if players[0][1] == local_id else players[1]
-        remote = players[0] if players[1][1] != local_id else players[1]
+        
+        local_info = self.get_local_player(players, local_id)
+        remote_info = self.get_remote_player(players, local_id)
 
-        self.local_player.update_info(local[0], local[1])
-        self.remote_player.update_info(remote[0], remote[1])
-
-        # Atualiza a interface para o jogador que estava esperando
-        self.update_interface()
+        self.local_player.update_info(local_info)
+        self.remote_player.update_info(remote_info)
         
         self.notify("Jogador conectado! Partida iniciando...")
+        self.update_interface()
 
-    def equalize_check(self):
-        """checa se o player local tem menos cartas, se sim, compra mais"""  
-        if len(self.local_player.cards) < len(self.remote_player.cards):
-            qtde = len(self.remote_player.cards) - len(self.local_player.cards)
-            for i in range(qtde):
-                card = self.deck.buy_card()
-                self.local_player.add_card(card)
-
-    def receive_move(self, move_data):
-        """Recebe o movimento do adversário."""
-        move_nature = move_data["nature"]
-
-        self.notify(f"receive move, nature: {move_nature}")
-        print(f"receive move, nature: {move_nature}")
-
-        self.switch_turn()
-
-        if move_nature == "dealing_initial_cards":
-            self.deck.receive_deck(move_data["deck"])
-            self.local_player.cards = move_data["initial_deck"]
-            self.update_interface()
-            
-        elif move_nature == "put_card":
-            print('receive put card')
-            print(move_data['board'])
-            self.board.board = move_data["board"]
-            self.remote_player.score = move_data["local_score"]
-            self.deck.deck = move_data["deck"]
-            self.game_over = move_data["end"]
-            self.match_status = 3
-            self.update_interface()
+    def get_local_player(self, players, local_id):
+        for player in players:
+            if player[1] == local_id:
+                return player
+        return None
+    
+    def get_remote_player(self, players, local_id):
+        for player in players:
+            if player[1] != local_id:
+                return player
+        return None
+    
+    def receive_withdrawal_notification(self):
+        """Recebe a notificação de que o outro jogador saiu da partida."""
+        self.set_match_status(5)
+        self.notify("O outro jogador saiu da partida. Voltando para a tela inicial em 5 segundos...")
+        self.interface.root.after(5000, self.main_controller.show_menu)
+                
+    def verify_card_equity(self):
+        """Verifica quantas cartas de diferença entre os jogadores."""
+        local_cards = self.local_player.card_number
+        remote_cards = self.remote_player.card_number
         
-        elif move_nature == "buy_card":
-            self.deck.receive_deck(move_data["deck"])
-            self.remote_player.cards.append(None) # adiciona carta nula para atualizar contagem
-            print("local player deck size", self.local_player.cards)
-            print("remote player deck size", self.remote_player.cards)
-            self.equalize_check()
-            self.update_interface()
-
+        if remote_cards > local_cards:
+            return remote_cards - local_cards
+        
+        return 0
+                
+    def receive_move(self, move_data):
+        
+        nature = move_data["nature"]
+        
+        match nature:
+            case "game_over":
+                self.set_match_status(2)
+                winner = self.check_winner()
+                self.interface.display_winner(winner)
+                return
             
-        # Verificar se a interface ainda está disponível antes de atualizar
-        if self.interface.root and self.interface.root.winfo_exists():
-            self.update_interface()
+            case "normal_play":
+                self.deck.update_deck(move_data["deck"])
+                self.board.update_board(move_data["board"])
+                self.remote_player.update_card_number(move_data["remote_card_number"])
+                self.remote_player.update_score(move_data["remote_score"])
+                
+                cards = self.verify_card_equity()
+                
+                for _ in range(cards):
+                    self.buy_card("system")
+                    
+                self.switch_turn()
+                self.set_match_status(3)
+                    
+            case "buy_card":
+                self.deck.update_deck(move_data["deck"])
+                self.remote_player.update_card_number(move_data["remote_card_number"])
+                
+                cards = self.verify_card_equity()
+                
+                for _ in range(cards):
+                    self.buy_card("system")
+                    
+            case "dealing_initial_cards":
+                self.deck.update_deck(move_data["deck"])
+                self.local_player.update_hand(move_data["local_hand"])
+                self.remote_player.update_card_number(move_data["remote_card_number"])
+                print(f"Cartas recebidas!: {self.deck.deck}")
+                self.update_interface()
+
+        
+        # self.unblock_all_lines()
+        self.update_interface()
+        # self.switch_turn()
     
     def send_move(self, move_nature):
         """Envia o movimento para o adversário."""
         move_data = {
             "nature": move_nature,
             "board": self.board.board,
-            "player_deck_size": len(self.local_player.cards),
-            "local_score": self.local_player.score,
-            "initial_deck": self.remote_player.cards,
             "deck": self.deck.deck,
-            "end": self.game_over,
+            "local_hand": self.remote_player.cards,
+            "remote_card_number": self.local_player.card_number,
+            "remote_score": self.local_player.score,
             "match_status": "next"
         }
         self.dog_actor.send_move(move_data)
@@ -191,89 +243,75 @@ class GameController(DogPlayerInterface):
             "shop_size": len(self.deck.deck),
             "board": self.board.board,
             "notifications": self.notification_manager.notifications,
-            "valid_moves": self.valid_moves
         }
-        self.interface.root.after(0, lambda: self.interface.update(informations))
-        print('self.update_interface: interface atualizada')
+        
+        if self.interface.root and self.interface.root.winfo_exists():
+            self.interface.root.after(0, lambda: self.interface.update(informations))
+            print('self.update_interface: interface atualizada')
             
     def notify(self, message: str):
         """Notifica o jogador."""
         self.notification_manager.add_notification(message)
         self.update_interface()
         
+    def get_match_status(self):
+        return self.match_status   
+    
     def reset_game(self):
         """Reseta o jogo."""
-        self.board.reset()
-        self.deck.reset()
-        self.local_player.reset()
-        self.remote_player.reset()
-        self.notification_manager.reset()
-        self.match_status = 1
-        self.game_over = False
         
-    def verify_lines_sum(self):
-        """checa se alguma linha, coluna ou diagonal somou 10"""
-        points = 0
-        for i in range(10):
-            if i < 4: # linhas
-                cards = self.board.board[i]
-            elif i < 8: # colunas
-                col_i = i - 4
-                cards = [ self.board.board[row_i][col_i] for row_i in range(4) ]
-            else: # diagonais
-                if i == 8: # diagonal principal
-                    cards = [ self.board.board[x][x] for x in range(4) ]
-                if i == 9: # diagonal secundaria
-                    cards = [ self.board.board[x][3 - x] for x in range(4) ]
-            
+        match_status = self.get_match_status()
+        
+        if match_status == 2 or match_status == 5:
+            self.remote_player.reset()
+            self.local_player.reset()
+            self.board.reset()
+            self.deck.reset()
+            self.notification_manager.reset()
+            self.set_match_status(1)
+            self.update_interface()
 
-            total_cards_in_line = sum([1 for card in cards if card != 0])
-            if total_cards_in_line == 4 and sum(cards) == 10:
-                points += 4
-                self.board.remove(i) # remove linha do tabuleiro
-        
-        self.local_player.add_score(points)
-        
-        return points
 
-        
     def put_card(self, i: int, j: int):
         """Coloca uma carta no tabuleiro."""
     
-        # Confere se o jogador possui uma carta selecionada
-        if not self.local_player.selected_card:
-            return
+        selected_card = self.local_player.selected_card
         
-        card = self.local_player.selected_card # Pega a carta selecionada
-        self.board.put_card(card, i, j) # Coloca a carta no tabuleiro
-        self.local_player.remove_card(card) # Remove a carta do jogador
-
-        self.verify_lines_sum()
-        
-        self.local_player.selected_card = None
-        
-        self.switch_turn()
-        self.buy_card(system_call=True)
-        self.update_interface() # Atualiza a interface
-        self.send_move("put_card")
+        if selected_card != None:
+            self.board.put_card(selected_card, i, j)
+            self.local_player.remove_card(selected_card)
+            
+            for i in range(10):
+                line = self.board.get_line(i)
+                
+                if sum(line) == 10:
+                    self.board.clear_line(i)
+                    self.local_player.add_score(4)
+            
+            self.local_player.select_card(None)
+            
+            self.switch_turn()
+            self.set_match_status(4)
+            
+            self.update_interface()
+            self.send_move("normal_play")
+            
+    
         
     def select_card(self, value):
-        
         if not self.local_player.turn:
-            self.notify("Aguarde seu turno para selecionar uma carta!")
+            self.notify("Aguarde sua vez para selecionar uma carta!")
             return
-
+        
         self.interface.render_board()
         
-        # Define a carta selecionada
-        self.local_player.selected_card = value
-        # Checa os movimentos válidos para a carta selecionada
-        valid_moves = self.check_available_moves(value)
+        self.local_player.select_card(value)
         
-        for i in range(10):
-            if valid_moves[i] == False:
+        available_moves = self.check_available_moves(value)
+        
+        for i in range(len(available_moves)):
+            if not available_moves[i]:
                 self.interface.block_line(i)
-
 
     def attribute_winner(self):
         if self.local_player.score > self.remote_player.score:
@@ -282,90 +320,98 @@ class GameController(DogPlayerInterface):
         else:
             self.local_player.won = False       
             self.remote_player.won = True
-    
-    def check_available_moves(self, card) -> list:
+            
+    def check_available_moves(self, value) -> list:
         
-        lines = [False for _ in range(10)]
+        lines = [True for _ in range(10)]
+        
         for i in range(10):
-            if i < 4: # linhas
-                cards = self.board.board[i]
-            elif i < 8: # colunas
-                col_i = i - 4
-                cards = [ self.board.board[row_i][col_i] for row_i in range(4) ]
-            else: # diagonais
-                if i == 8: # diagonal principal
-                    cards = [ self.board.board[x][x] for x in range(4) ]
-                if i == 9: # diagonal secundaria
-                    cards = [ self.board.board[x][3 - x] for x in range(4) ]
-
-            card_count = sum([1 for card in cards if card != 0])
-
-            match card_count:
-                case 0:
-                    lines[i] = True
+            
+            line = self.board.get_line(i)
+            
+            cards_put = 4 - line.count(0)
+            
+            match cards_put:
                 case 1:
-                    if sum(card for card in cards if card is not None) + card <= 8:
-                        lines[i] = True
+                    if sum(line) + value > 8:
+                        lines[i] = False
                 case 2:
-                    if sum(card for card in cards if card is not None) + card <= 9:
-                        lines[i] = True
+                    if sum(line) + value > 9:
+                        lines[i] = False
                 case 3:
-                    if sum(card for card in cards if card is not None) + card == 10:
-                        lines[i] = True
-                case _:
-                    lines[i] = False
-                            
-        return lines
+                    if sum(line) + value != 10:
+                        lines[i] = False
         
-    def buy_card(self, system_call=False):
+        return lines
+    
+    def get_player_turn(self):
+        if self.local_player.turn:
+            return self.local_player
+        else:
+            return self.remote_player
+    
+    def buy_card(self, called: str = "player"):
         """Compra uma carta."""
 
-        if system_call:
-            if len(self.deck.deck) > 0: # checa se o baralho tem cartas
-                card = self.deck.buy_card()
-                self.local_player.add_card(card)
-                self.update_interface()
-                self.notify("Carta comprada automaticamente!")
-            else:
-                self.notify("Baralho está vazio!")
-                
-                is_any_move_available = False
-                for card in self.local_player.cards:
-                    available_moves = self.check_available_moves(card)
-                    if any(available_moves):
-                        is_any_move_available = True
-                        break
-                
-                if is_any_move_available:
-                    self.update_interface()
-                else:
-                    self.match_status = 2 # status game over
-                    self.attribute_winner()
-        
-        if not system_call:
-
-            if not self.local_player.turn:
-                self.notify("Aguarde seu turno para comprar uma carta!")
-
-            else: # checa se eh o turno do local_player
-                is_any_move_available = False
-                for card in self.local_player.cards:
-                    available_moves = self.check_available_moves(card)
-                    if any(available_moves):
-                        is_any_move_available = True
-
-                if is_any_move_available:
-                    self.notify("Ainda ha jogadas disponíveis, não eh possivel comprar cartas")
-                else:
-                    if len(self.deck.deck) > 0:
-                        card = self.deck.buy_card()
-                        self.local_player.add_card(card)
-                        self.send_move("buy_card")
-                        self.switch_turn() 
-                        self.update_interface()
-                    else:
-                        self.notify("Baralho está vazio!")
-                        self.match_status = 2 # status game over
-                        self.attribute_winner()
-
+        if called == "player":
+            player = self.get_player_turn()
             
+            if player != self.local_player:
+                self.notify("Aguarde seu turno para comprar uma carta!")
+                return
+            
+            cards = self.local_player.get_cards()
+            
+            for card in cards:
+                availables = self.check_available_moves(card)
+                
+                if any(availables):
+                    self.notify("Ainda há jogadas disponíveis, não é possível comprar cartas.")
+                    return
+        
+        empty = self.deck.is_empty()
+        
+        if not empty:
+            card = self.deck.buy_card()
+            self.local_player.add_card(card)
+            
+            if called == "player":
+                self.switch_turn()
+                self.send_move("buy_card")
+                
+            self.update_interface()
+        
+        else:
+            
+            self.notify("Baralho está vazio! Não é possível comprar cartas.")
+            
+            if called == "system":
+                
+                cards = self.local_player.get_cards()
+                
+                for card in cards:
+                    availables = self.check_available_moves(card)
+                    
+                    if any(availables):
+                        self.update_interface()
+                        return
+            
+            self.set_match_status(2)
+            
+            winner = self.check_winner()
+            
+            self.interface.display_winner(winner)
+            
+            self.switch_turn()
+            
+            self.send_move("game_over")
+            
+            
+    def check_winner(self):
+        if self.local_player.score >= self.remote_player.score:
+            return True
+        else:
+            return False
+            
+    def set_match_status(self, status: int):
+        self.match_status = status

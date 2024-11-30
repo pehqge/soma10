@@ -15,12 +15,17 @@ class CardDeck:
         card = self.deck.pop()
         return card
     
+    def is_empty(self):
+        """Retorna True se o deck estiver vazio, False caso contrário."""
+        
+        return not self.deck
+    
     def initialize_deck(self):
         """ Inicializa o deck."""
         self.deck = [1] * 18 + [2] * 18 + [3] * 14 + [4] * 8 + [5] * 4 + [6] * 2 + [7] * 2
         shuffle(self.deck)
         
-    def receive_deck(self, deck):
+    def update_deck(self, deck):
         """ Recebe um deck."""
         self.deck = deck
         

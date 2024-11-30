@@ -151,6 +151,35 @@ class GameInterface(Interface):
             if "\n" in notification:
                 y += notification.count("\n") * 24
             y += 24 # Incrementa a posição Y para a próxima notificação
+            
+    def display_winner(self, local_win: bool):
+        """ Exibe a tela de vitória/derrota. """
+        
+        self.ui_tools.load_and_display("bg gameover", "assets/jogo/fundo gameover.png", 0, 0) # Carrega o background
+        self.ui_tools.create_resizable_button("assets/jogo/botao menu.png", 640, 630, self.main_controller.show_menu) # Botão de voltar para o menu
+        
+        # renderiza a pontuação de cada jogador
+        self.informacoes["j1_pontos"] = 388
+        self.informacoes["j2_pontos"] = 377
+        
+        j2_textoX = 825 - (len(str(self.informacoes["j2_pontos"])) - 1) * 18
+        
+        self.ui_tools.write_text(text=f'{self.informacoes["j1_pontos"]} pontos', x=316, y=466, size=34, color="#FF648D", font="quicksand")
+        self.ui_tools.write_text(text=f'{self.informacoes["j2_pontos"]} pontos', x=j2_textoX, y=466, size=34, color="#FF648D", font="quicksand")
+        
+        
+        # anuncio do vencedor
+        if local_win:
+            self.ui_tools.write_text("Você é o vencedor!!", 348, 260, 64, "#F7AA00", "quicksand", 1000)
+        else:
+            self.ui_tools.write_text("Você perdeu! :(", 420, 260, 64, "#FF648D", "quicksand", 1000)
+            
+        # posicao da coroa
+        coroaX = 216
+        if not local_win:
+            coroaX = 1045
+            
+        self.ui_tools.load_and_display("coroa", "assets/jogo/coroa.png", coroaX, 360)
     
     def update(self, update_dict: dict):
         """ Atualiza as informações do jogo vindas do controller. """
