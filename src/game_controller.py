@@ -179,10 +179,6 @@ class GameController(DogPlayerInterface):
         
         nature = move_data["nature"]
 
-        print(f"local player cards", self.local_player.card_number)
-        print(f"remote player cards", self.remote_player.card_number)
-
-
         match nature:
             case "game_over":
                 self.set_match_status(2)
@@ -199,7 +195,6 @@ class GameController(DogPlayerInterface):
                 cards = self.verify_card_equity()
                               
                 for _ in range(cards):
-                    print("card buyed")
                     self.buy_card("system")
                     
                 self.switch_turn()
@@ -255,7 +250,6 @@ class GameController(DogPlayerInterface):
         
         if self.interface.root and self.interface.root.winfo_exists():
             self.interface.root.after(0, lambda: self.interface.update(informations))
-            print('self.update_interface: interface atualizada')
             
     def notify(self, message: str):
         """Notifica o jogador."""
