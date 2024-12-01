@@ -31,6 +31,7 @@ class GameController(DogPlayerInterface):
         self.match_status = 1
         self.dog_actor = DogActor()
         self.debug = False
+        self.game_over = False
         
         self.update_interface()
         
@@ -167,9 +168,12 @@ class GameController(DogPlayerInterface):
         match nature:
             case "game_over":
                 print("Partida finalizada!")
+                self.notify("GAME OVERRRR")
+                
                 self.set_match_status(2)
+                self.game_over = True
                 winner = self.check_winner()
-                self.interface.root.after(0, lambda: self.interface.display_winner(winner))
+                self.interface.root.after(1000, lambda: self.interface.display_winner(winner))
                 return
             
             case "normal_play":
@@ -187,6 +191,10 @@ class GameController(DogPlayerInterface):
                     self.switch_turn()
                     self.set_match_status(3)
                     
+                if all(self.check_available_moves(card) == [False for _ in range(10)] for card in self.local_player.cards):
+                    self.notify("Você não possui jogadas disponíveis!")
+                    self.buy_card("system")
+                    
             case "buy_card":
                 self.deck.update_deck(move_data["deck"])
                 self.remote_player.update_card_number(move_data["remote_card_number"])
@@ -199,6 +207,10 @@ class GameController(DogPlayerInterface):
                 if not self.debug:
                     self.switch_turn()
                     self.set_match_status(3)
+                    
+                if all(self.check_available_moves(card) == [False for _ in range(10)] for card in self.local_player.cards):
+                    self.notify("Você não possui jogadas disponíveis!")
+                    self.buy_card("system")
                     
             case "dealing_initial_cards":
                 self.deck.update_deck(move_data["deck"])
@@ -221,8 +233,8 @@ class GameController(DogPlayerInterface):
         """Recebe a notificação de que o outro jogador saiu da partida."""
         
         self.set_match_status(5)
-        self.notify("O outro jogador saiu da partida. Voltando para a tela inicial em 5 segundos...")
-        self.interface.root.after(5000, self.main_controller.show_menu)
+        self.notify("O outro jogador saiu da partida. Voltando para a tela inicial em 1 segundo...")
+        self.interface.root.after(1000, self.main_controller.show_menu)
         
     def choose_card(self, value):
         """Seleciona uma carta."""
@@ -316,7 +328,7 @@ class GameController(DogPlayerInterface):
                 cards = self.local_player.get_cards()
                 
                 for card in cards:
-                    availables = self.check_available_moves(card)[:8]
+                    availables = self.check_available_moves(card)
                     
                     if any(availables):
                         self.update_interface()
@@ -324,11 +336,14 @@ class GameController(DogPlayerInterface):
             
             self.set_match_status(2)
             
-            winner = self.check_winner()
-            self.interface.root.after(0, lambda: self.interface.display_winner(winner))
+            self.notify("GAME OVERRRR")
             
-            # self.switch_turn()
-            # self.send_move("game_over")
+            self.game_over = True
+            winner = self.check_winner()
+            self.interface.root.after(10, lambda: self.interface.display_winner(winner))
+            
+            self.switch_turn()
+            self.send_move("game_over")
                 
     def check_available_moves(self, value) -> list: 
         """Retorna quais são as jogadas disponíveis em uma lista de booleanos.
@@ -431,7 +446,7 @@ class GameController(DogPlayerInterface):
             "aguardando": self.match_status == 4
         }
         
-        if self.interface.root and self.interface.root.winfo_exists():
+        if self.interface.root and self.interface.root.winfo_exists() and not self.game_over:
             self.interface.root.after(0, lambda: self.interface.update(informations))
             
     def reset_game(self):

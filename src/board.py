@@ -17,12 +17,24 @@ class Board:
         
         if i < 4:
             return self.board[i]
+        
         elif i < 8:
-            return [self.board[j][i-4] for j in range(4)]
+            line = []
+            for j in range(4):
+                line.append(self.board[j][i-4])
+            return line
+        
         elif i == 8:
-            return [self.board[j][j] for j in range(4)]
+            line = []
+            for j in range(4):
+                line.append(self.board[j][j])
+            return line
+        
         else:
-            return [self.board[j][3-j] for j in range(4)]
+            line = []
+            for j in range(4):
+                line.append(self.board[j][3-j])
+            return line
     
     def put_card(self, card_number: int, i: int, j: int):
         """Coloca uma carta no tabuleiro."""
@@ -41,8 +53,7 @@ class Board:
             self.board[i] = [0, 0, 0, 0]
         elif i < 8: # colunas
             for row in range(4):
-                col = i - 4
-                self.board[row][col] = 0
+                self.board[row][i - 4] = 0
         else: # diagonais
             if i == 8: # diagonal principal
                 for x in range(4):

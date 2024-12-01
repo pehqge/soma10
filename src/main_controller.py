@@ -31,6 +31,7 @@ class MainController:
         """Exibe o menu principal."""
         
         self.game.interface.hide()
+        self.reset_game()
         self.tutorial_menu.hide()
         self.main_menu.show()
 
@@ -46,6 +47,12 @@ class MainController:
         self.main_menu.hide()
         self.tutorial_menu.hide()
         self.game.start_match(debug=False)
+        
+    def reset_game(self):
+        """Reseta o jogo."""
+        
+        self.game = GameController(self)
+        self.game.interface.hide()
 
 
     def start(self):

@@ -132,9 +132,6 @@ class GameInterface(Interface):
         self.ui_tools.create_resizable_button("assets/jogo/botao menu.png", 640, 630, self.main_controller.show_menu) # Botão de voltar para o menu
         
         # renderiza a pontuação de cada jogador
-        self.informacoes["j1_pontos"] = 388
-        self.informacoes["j2_pontos"] = 377
-        
         j2_textoX = 825 - (len(str(self.informacoes["j2_pontos"])) - 1) * 18
         
         self.ui_tools.write_text(text=f'{self.informacoes["j1_pontos"]} pontos', x=316, y=466, size=34, color="#FF648D", font="quicksand")
@@ -158,7 +155,6 @@ class GameInterface(Interface):
         """ Atualiza as informações do jogo vindas do controller. """
         
         self.informacoes = update_dict # Atualiza as informações do jogo
-        
         # Reseta a interface
         self.root.after(0, self.ui_tools.clear_canvas)
         self.root.after(0, self.setup)
