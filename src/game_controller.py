@@ -178,7 +178,11 @@ class GameController(DogPlayerInterface):
     def receive_move(self, move_data):
         
         nature = move_data["nature"]
-        
+
+        print(f"local player cards", self.local_player.card_number)
+        print(f"remote player cards", self.remote_player.card_number)
+
+
         match nature:
             case "game_over":
                 self.set_match_status(2)
@@ -193,8 +197,9 @@ class GameController(DogPlayerInterface):
                 self.remote_player.update_score(move_data["remote_score"])
                 
                 cards = self.verify_card_equity()
-                
+                              
                 for _ in range(cards):
+                    print("card buyed")
                     self.buy_card("system")
                     
                 self.switch_turn()
@@ -208,10 +213,13 @@ class GameController(DogPlayerInterface):
                 
                 for _ in range(cards):
                     self.buy_card("system")
+
+                self.switch_turn()
                     
             case "dealing_initial_cards":
                 self.deck.update_deck(move_data["deck"])
                 self.local_player.update_hand(move_data["local_hand"])
+                self.local_player.update_card_number(len(self.local_player.cards))
                 self.remote_player.update_card_number(move_data["remote_card_number"])
                 print(f"Cartas recebidas!: {self.deck.deck}")
                 self.update_interface()
