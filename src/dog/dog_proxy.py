@@ -1,4 +1,4 @@
-from distutils.command.config import config
+from setuptools import config
 import json
 from urllib.parse import urldefrag
 import requests

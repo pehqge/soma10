@@ -1,13 +1,10 @@
 from interface import Interface
 
-
-
-
 class MenuInterface(Interface):
     def __init__(self, main_controller):
         super().__init__(main_controller)
         self.setup()
-
+        
     def setup(self):
         # Carrega e exibe o background
         self.ui_tools.load_and_display("bg", "assets/menu/fundo.png", 0, 0)

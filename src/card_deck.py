@@ -1,41 +1,37 @@
-from random import shuffle
+from random import shuffle, choice
 
 class CardDeck:
     def __init__(self):
-        # Inicializa o deck de acordo com as regras oficiais do jogo
-        self.deck = [1] * 18 + [2] * 18 + [3] * 14 + [4] * 8 + [5] * 4 + [6] * 2 + [7] * 2
-        
-        # Embaralha o deck
-        shuffle(self.deck)
-        
-        # Inicializa o tamanho do deck
-        self.size = len(self.deck)
+        # Inicializa o deck
+        self.deck = []
         
     def buy_card(self):
         """Retira uma carta do deck e a retorna."""
         
-        if self.size == 0: # Retorna None se o deck estiver vazio
+        if not self.deck: # Retorna None se o deck estiver vazio
             return None
         
         # Caso contrário, retira a carta do topo do deck
         card = self.deck.pop()
-        self.size -= 1
         return card
     
-    def reset_deck(self):
-        """ Reinicia o deck."""
+    def is_empty(self):
+        """Retorna True se o deck estiver vazio, False caso contrário."""
         
-        self.deck = [1] * 18 + [2] * 18 + [3] * 14 + [4] * 8 + [5] * 4 + [6] * 2 + [7] * 2
+        return not self.deck
+    
+    def initialize_deck(self):
+        """ Inicializa o deck."""
+        # self.deck = [1] * 18 + [2] * 18 + [3] * 14 + [4] * 8 + [5] * 4 + [6] * 2 + [7] * 2
+        for _ in range(3):
+            self.deck.append(choice([1, 2, 3, 4, 5, 6, 7]))
+        
         shuffle(self.deck)
-        self.size = len(self.deck)
-
-    def update_deck(self, cards):
-        """ Atualiza deck"""
-        self.deck = cards
-        self.size = len(self.deck)
-
-    def empty(self):
-        """ Checa se o baralho está vazio """
-        if len(self.deck) > 0:
-            return False
-        return True
+        
+    def update_deck(self, deck):
+        """ Recebe um deck."""
+        self.deck = deck
+        
+    def reset(self):
+        """ Reseta o deck."""
+        self.deck = []

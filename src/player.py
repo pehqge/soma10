@@ -1,27 +1,46 @@
 class Player:
-    def __init__(self, identifier: str):
+    def __init__(self, name: str, id: str):
         self.cards = []
+        self.card_number = 0
         self.score = 0
-        self.identifier = identifier
+        self.name = name
+        self.id = id
         self.turn = False
-        self.selected_card = None
-        self.won_game = False
+        self.chosen_card = None
+        self.won = None
+    
+    def get_cards(self):
+        return self.cards
+    
+    def update_score(self, score: int):
+        self.score = score
+    
+    def update_hand(self, cards: list):
+        self.cards = cards
+    
+    def update_info(self, info: list):
+        self.name = info[0]
+        self.id = info[1]
+        
+    def update_card_number(self, card_number: int):
+        self.card_number = card_number
         
     def add_card(self, card: int):
         """Adiciona uma carta à mão do jogador."""
         
         self.cards.append(card)
+        self.card_number += 1
         
     def remove_card(self, card: int):
         """Remove uma carta da mão do jogador."""
         
         self.cards.remove(card)
-        self.selected_card = None
+        self.card_number -= 1
         
-    def select_card(self, card: int):
+    def choose_card(self, card: int):
         """Indica uma carta como a seleção do jogador."""
         
-        self.selected_card = card
+        self.chosen_card = card
         
     def add_score(self, score: int):
         """Atualiza o score do jogador."""
@@ -31,22 +50,10 @@ class Player:
     def reset(self):
         """Reseta o jogador."""
         
+        self.id = None
+        self.name = None
         self.score = 0
         self.cards = []
-        self.selected_card = None
+        self.card_number = 0
+        self.chosen_card = None
         self.turn = False
-
-    def change_shift(self):
-        """Muda o turno do jogador."""
-        
-        self.turn = not self.turn
-
-    def atrribute_victory(self):
-        """Atribui a vitória ao jogador."""
-        
-        pass
-
-    def atrribute_defeat(self):
-        """Atribui a derrota ao jogador."""
-        
-        pass
