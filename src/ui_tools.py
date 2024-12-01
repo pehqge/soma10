@@ -337,15 +337,12 @@ class UITools:
 
         return base_image
     
-    def create_shop_button(self, quantity: int, command: callable, static=False):
+    def create_shop_button(self, quantity: int, command: callable):
         """Cria um botão para a loja de itens."""
         
         base_image = self.merge_text_to_image("shop", quantity, "assets/jogo/comprar.png", "font_kid", 30, "#FF648D", 145, 21)
         
-        if static:
-            self.display_image("shop", 640, 87, anchor="center")
-        else:
-            self.create_resizable_button(base_image, 640, 87, command, anchor="center")
+        self.create_resizable_button(base_image, 640, 87, command, anchor="center")
         
     def create_resizable_button(self, image: str | Image.Image, x: int, y: int, command: callable, anchor="center", scale=1.08):
         """Cria um botão com redimensionamento no efeito de hover."""

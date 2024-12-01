@@ -45,7 +45,7 @@ class MainController:
         
         self.main_menu.hide()
         self.tutorial_menu.hide()
-        self.game.start_match(debug=True)
+        self.game.start_match(debug=False)
 
 
     def start(self):

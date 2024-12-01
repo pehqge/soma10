@@ -163,14 +163,13 @@ class GameController(DogPlayerInterface):
         """Recebe o movimento do adversário."""
         
         nature = move_data["nature"]
-        
-        board = move_data["board"]
 
         match nature:
             case "game_over":
+                print("Partida finalizada!")
                 self.set_match_status(2)
                 winner = self.check_winner()
-                self.interface.display_winner(winner)
+                self.interface.root.after(0, lambda: self.interface.display_winner(winner))
                 return
             
             case "normal_play":
@@ -242,7 +241,7 @@ class GameController(DogPlayerInterface):
         for i in range(4):
             for j in range(4):
                 if not available_matrix[i][j]:
-                    self.interface.block_position(i, j)
+                    self.interface.block_position(j, i)
                 
     def put_card(self, i: int, j: int):
         """Coloca uma carta no tabuleiro."""
@@ -292,9 +291,6 @@ class GameController(DogPlayerInterface):
                 
                 if any(True in row for row in availables_matrix):
                     self.notify("Ainda há jogadas disponíveis, não é possível comprar cartas.")
-                    print(f"availables_matrix: {availables_matrix}")
-                    print(f"availables: {availables}")
-                    print(f"board: {self.board.board}")
                     return
         
         empty = self.deck.is_empty()
@@ -329,11 +325,10 @@ class GameController(DogPlayerInterface):
             self.set_match_status(2)
             
             winner = self.check_winner()
-            print("display winner")
-            self.interface.display_winner(winner)
+            self.interface.root.after(0, lambda: self.interface.display_winner(winner))
             
-            self.switch_turn()
-            self.send_move("game_over")
+            # self.switch_turn()
+            # self.send_move("game_over")
                 
     def check_available_moves(self, value) -> list: 
         """Retorna quais são as jogadas disponíveis em uma lista de booleanos.
@@ -342,6 +337,9 @@ class GameController(DogPlayerInterface):
             8 : diagonal principal.
             9 : diagonal secundária.
         """
+        
+        if value == None:
+            return [False for _ in range(10)]
         
         lines = [True for _ in range(10)]
         
@@ -360,12 +358,13 @@ class GameController(DogPlayerInterface):
                 case 3:
                     if sum(line) + value != 10:
                         lines[i] = False
+                        
         
         return lines
     
     def convert_available_list_to_matrix(self, available_moves: list) -> list:
         
-        matrix = [[self.board.board[i][j] == 0 for i in range(4)] for j in range(4)]
+        matrix = [[self.board.board[j][i] == 0 for i in range(4)] for j in range(4)]
         
         for i in range(10):
             if not available_moves[i]:
@@ -456,7 +455,7 @@ class GameController(DogPlayerInterface):
         for player in players:
             if player[1] == local_id:
                 return player
-        return None
+        return player
     
     def get_remote_player(self, players, local_id):
         """Retorna o jogador remoto."""
@@ -464,7 +463,7 @@ class GameController(DogPlayerInterface):
         for player in players:
             if player[1] != local_id:
                 return player
-        return None
+        return player
         
     def get_player_turn(self):
         """Retorna o jogador da vez."""

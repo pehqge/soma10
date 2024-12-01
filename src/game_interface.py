@@ -26,11 +26,7 @@ class GameInterface(Interface):
         self.display_notification()
         
         # Loja de itens
-        if self.informacoes["shop_size"] > 0: # Se a loja não estiver vazia, o botão é clicável
-            static = False # Flag que indica se o botão é clicável
-        else:
-            static = True
-        self.ui_tools.create_shop_button(self.informacoes["shop_size"], self.game_controller.buy_card, static)
+        self.ui_tools.create_shop_button(self.informacoes["shop_size"], self.game_controller.buy_card)
         
         # Tela de aguardando
         if self.informacoes["aguardando"]:
@@ -128,6 +124,9 @@ class GameInterface(Interface):
             
     def display_winner(self, local_win: bool):
         """ Exibe a tela de vitória/derrota. """
+        
+        # limpa o display
+        self.ui_tools.clear_canvas()
         
         self.ui_tools.load_and_display("bg gameover", "assets/jogo/fundo gameover.png", 0, 0) # Carrega o background
         self.ui_tools.create_resizable_button("assets/jogo/botao menu.png", 640, 630, self.main_controller.show_menu) # Botão de voltar para o menu
