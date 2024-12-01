@@ -6,7 +6,7 @@ class Player:
         self.name = name
         self.id = id
         self.turn = False
-        self.selected_card = None
+        self.chosen_card = None
         self.won = None
     
     def get_cards(self):
@@ -37,10 +37,10 @@ class Player:
         self.cards.remove(card)
         self.card_number -= 1
         
-    def select_card(self, card: int):
+    def choose_card(self, card: int):
         """Indica uma carta como a seleção do jogador."""
         
-        self.selected_card = card
+        self.chosen_card = card
         
     def add_score(self, score: int):
         """Atualiza o score do jogador."""
@@ -55,5 +55,5 @@ class Player:
         self.score = 0
         self.cards = []
         self.card_number = 0
-        self.selected_card = None
+        self.chosen_card = None
         self.turn = False

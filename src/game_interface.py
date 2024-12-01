@@ -4,7 +4,6 @@ class GameInterface(Interface):
     def __init__(self, main_controller, game_controller):
         super().__init__(main_controller)
         self.game_controller = game_controller
-        self.waiting_screen = False
     
     def setup(self):
         # Carrega e exibe o background
@@ -33,21 +32,13 @@ class GameInterface(Interface):
             static = True
         self.ui_tools.create_shop_button(self.informacoes["shop_size"], self.game_controller.buy_card, static)
         
-        # Botao de voltar para o menu e resetar game
-        self.ui_tools.create_resizable_button("assets/jogo/close.png", 1242, 40, self.main_controller.show_menu)
-        
-        if self.waiting_screen:
+        # Tela de aguardando
+        if self.informacoes["aguardando"]:
             self.ui_tools.load_and_display("aguardando", "assets/jogo/aguardando.png", 0, 0)
-            self.ui_tools.write_text(text=self.waiting_message, x=1180, y=465, size=42, width=1080, color="white", font="quicksand", center=True)
+        
+        # Botao de voltar para o menu e resetar game
+        self.ui_tools.create_resizable_button("assets/jogo/close.png", 1242, 40, self.game_controller.withdrawal)
             
-    def toggle_waiting_screen(self, on: bool, message=""):
-        """ Exibe a tela de espera. """
-        if on:
-            self.waiting_screen = True
-            self.waiting_message = message
-            self.setup()
-        else:
-            self.waiting_screen = False
         
     def render_board(self):
         """ Renderiza o tabuleiro de jogo. """
@@ -63,29 +54,12 @@ class GameInterface(Interface):
                 self.ui_tools.create_board_cell(card_number=board[i][j], i=i, j=j, on_click=on_click)
                 
                     
-    def block_line(self, i):
-        """ 0 <= i <= 3 : Bloqueia a linha i do tabuleiro. 
-            4 <= i <= 7 : Bloqueia a coluna i-4 do tabuleiro. 
-            8 : Bloqueia a diagonal principal do tabuleiro. 
-            9 : Bloqueia a diagonal secundária do tabuleiro. """
+    def block_position(self, i, j):
+        """ Bloqueia a posição (i, j) do tabuleiro. """
     
         board = self.informacoes["board"]
         
-        if i < 4:
-            for j in range(4):
-                    self.ui_tools.dark_cell(card_number=board[i][j], i=i, j=j)
-                    
-        elif i < 8:
-            for j in range(4):
-                    self.ui_tools.dark_cell(card_number=board[j][i-4], i=j, j=i-4)
-                    
-        elif i == 8:
-            for j in range(4):
-                    self.ui_tools.dark_cell(card_number=board[j][j], i=j, j=j)
-                    
-        elif i == 9:
-            for j in range(4):
-                    self.ui_tools.dark_cell(card_number=board[j][3-j], i=j, j=3-j)
+        self.ui_tools.dark_cell(card_number=board[i][j], i=i, j=j)
         
     def render_local_player(self):
         """ Renderiza o menu do jogador local. """
@@ -102,7 +76,7 @@ class GameInterface(Interface):
             count = cards.count(card_number) # Quantidade daquela ficha no baralho do jogador
 
             if count > 0: # Se tiver pelo menos uma carta, a carta é clicável
-                on_click = lambda event, value=card_number: self.game_controller.select_card(value) # Função que será ativada quando a carta for clicada
+                on_click = lambda event, value=card_number: self.game_controller.choose_card(value) # Função que será ativada quando a carta for clicada
                 
             else: # Se não tiver carta daquele número, ela não é clicável
                 on_click = None

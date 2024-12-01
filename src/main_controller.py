@@ -2,6 +2,7 @@ from tkinter import Tk, PhotoImage
 from menu_interface import MenuInterface
 from game_controller import GameController
 from tutorial_interface import TutorialInterface
+import gc
 
 class MainController:
     def __init__(self):
@@ -29,7 +30,8 @@ class MainController:
     def show_menu(self):
         """Exibe o menu principal."""
         
-        self.reset_application() # Reseta a aplicação por completo
+        self.game.interface.hide()
+        self.tutorial_menu.hide()
         self.main_menu.show()
 
     def show_tutorial(self):
@@ -43,16 +45,9 @@ class MainController:
         
         self.main_menu.hide()
         self.tutorial_menu.hide()
-        self.game.start_match()
+        self.game.start_match(debug=True)
 
-    def reset_application(self):
-        """Remove o jogo antigo e exibe o menu principal."""
-        
-        for widget in self.root.winfo_children():
-            widget.destroy()
-        
-        self.setup()
-        
+
     def start(self):
         """Inicia o loop principal da interface gráfica."""
         

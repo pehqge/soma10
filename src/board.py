@@ -1,6 +1,5 @@
 class Board:
     def __init__(self):
-        # Inicializa o board 4x4 vazio
         self.board = [[0 for _ in range(4)] for _ in range(4)]
         
     def update_board(self, board):
