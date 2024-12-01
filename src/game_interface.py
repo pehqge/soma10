@@ -49,9 +49,9 @@ class GameInterface(Interface):
         for i in range(4):
             for j in range(4):
                 on_click = (lambda event, value1=i, value2=j: 
-                    self.game_controller.put_card(value1, value2))
+                    self.game_controller.put_card(value2, value1))
                 
-                self.ui_tools.create_board_cell(card_number=board[i][j], i=i, j=j, on_click=on_click)
+                self.ui_tools.create_board_cell(card_number=board[j][i], i=i, j=j, on_click=on_click)
                 
                     
     def block_position(self, i, j):
