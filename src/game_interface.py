@@ -59,7 +59,7 @@ class GameInterface(Interface):
     
         board = self.informacoes["board"]
         
-        self.ui_tools.dark_cell(card_number=board[i][j], i=i, j=j)
+        self.ui_tools.dark_cell(card_number=board[j][i], i=i, j=j)
         
     def render_local_player(self):
         """ Renderiza o menu do jogador local. """

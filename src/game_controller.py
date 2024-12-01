@@ -270,7 +270,6 @@ class GameController(DogPlayerInterface):
             self.update_interface()
             
             self.send_move("normal_play")
-            print(self.board.board)
         
                 
     def buy_card(self, called: str = "player"):
