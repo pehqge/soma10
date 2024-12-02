@@ -1,7 +1,6 @@
 from tkinter import NW, Canvas
 from PIL import Image, ImageDraw, ImageFont, ImageTk
 import math
-import threading
 
 class UITools:
     def __init__(self, canvas: Canvas):

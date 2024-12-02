@@ -7,7 +7,6 @@ class Player:
         self.id = id
         self.turn = False
         self.chosen_card = None
-        self.won = None
     
     def get_cards(self):
         return self.cards

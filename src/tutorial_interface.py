@@ -1,4 +1,3 @@
-from ui_tools import UITools
 from interface import Interface
 
 class TutorialInterface(Interface):

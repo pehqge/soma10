@@ -2,7 +2,7 @@ class Board:
     def __init__(self):
         self.board = [[0 for _ in range(4)] for _ in range(4)]
         
-    def update_board(self, board):
+    def update_board(self, board: list[int]):
         """Atualiza o tabuleiro."""
         
         self.board = board
@@ -54,13 +54,12 @@ class Board:
         elif i < 8: # colunas
             for row in range(4):
                 self.board[row][i - 4] = 0
-        else: # diagonais
-            if i == 8: # diagonal principal
-                for x in range(4):
-                    self.board[x][x] = 0
-            if i == 9: # diagonal secundaria
-                for x in range(4):
-                    self.board[x][3 - x] = 0
+        elif i == 8: # diagonal principal
+            for x in range(4):
+                self.board[x][x] = 0
+        else: # diagonal secundaria
+            for x in range(4):
+                self.board[x][3 - x] = 0
 
     def reset(self):
         """Reinicia o tabuleiro voltando tudo para 0."""

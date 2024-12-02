@@ -159,5 +159,3 @@ class GameInterface(Interface):
         self.root.after(0, self.ui_tools.clear_canvas)
         self.root.after(0, self.setup)
         
-    def remote_update(self, callable):
-        self.root.after(100, callable)

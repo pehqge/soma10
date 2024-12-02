@@ -22,10 +22,10 @@ class GameController(DogPlayerInterface):
         
         # Inicializa as classes
         self.board = Board()
-        self.deck = CardDeck()
-        self.notification_manager = NotificationManager()
         self.local_player = Player("Jogador 1", 1)
         self.remote_player = Player("Jogador 2", 2)
+        self.deck = CardDeck()
+        self.notification_manager = NotificationManager()
         self.interface = GameInterface(main_controller, self)
         
         self.match_status = 1
@@ -59,7 +59,6 @@ class GameController(DogPlayerInterface):
         if debug:
             self.debug_start()
             return
-        
         
         self.reset_game()
         
@@ -124,7 +123,6 @@ class GameController(DogPlayerInterface):
         
         self.send_move("dealing_initial_cards")
         
-        self.notify("Partida iniciada!")
         self.update_interface()
     
     def receive_start(self, start_status):
@@ -149,6 +147,12 @@ class GameController(DogPlayerInterface):
     
     def send_move(self, move_nature):
         """Envia o movimento para o adversário."""
+        
+        if move_nature == "withdrawal":
+            match_status = "interrupted"
+        else:
+            match_status = "next"
+        
         move_data = {
             "nature": move_nature,
             "board": self.board.board,
@@ -156,11 +160,12 @@ class GameController(DogPlayerInterface):
             "local_hand": self.remote_player.cards,
             "remote_card_number": self.local_player.card_number,
             "remote_score": self.local_player.score,
-            "match_status": "interrupted" if move_nature == "withdrawal" else "next"
+            "match_status": match_status
         }
+        
         self.dog_actor.send_move(move_data)
                 
-    def receive_move(self, move_data):
+    def receive_move(self, move_data: dict):
         """Recebe o movimento do adversário."""
         
         nature = move_data["nature"]
@@ -217,7 +222,6 @@ class GameController(DogPlayerInterface):
                 self.local_player.update_hand(move_data["local_hand"])
                 self.local_player.update_card_number(len(self.local_player.cards))
                 self.remote_player.update_card_number(move_data["remote_card_number"])
-                self.update_interface()
 
         if move_data["match_status"] != "interrupted":
             self.update_interface()
@@ -238,10 +242,6 @@ class GameController(DogPlayerInterface):
         
     def choose_card(self, value):
         """Seleciona uma carta."""
-        
-        if not self.local_player.turn:
-            self.notify("Aguarde sua vez para selecionar uma carta!")
-            return
         
         self.interface.render_board()
         
@@ -292,7 +292,6 @@ class GameController(DogPlayerInterface):
             player = self.get_player_turn()
             
             if player != self.local_player:
-                self.notify("Aguarde seu turno para comprar uma carta!")
                 return
             
             cards = self.local_player.get_cards()
@@ -329,8 +328,9 @@ class GameController(DogPlayerInterface):
                 
                 for card in cards:
                     availables = self.check_available_moves(card)
+                    availables_matrix = self.convert_available_list_to_matrix(availables)
                     
-                    if any(availables):
+                    if any(True in row for row in availables_matrix):
                         self.update_interface()
                         return
             
@@ -342,7 +342,6 @@ class GameController(DogPlayerInterface):
             winner = self.check_winner()
             self.interface.root.after(10, lambda: self.interface.display_winner(winner))
             
-            self.switch_turn()
             self.send_move("game_over")
                 
     def check_available_moves(self, value) -> list: 
@@ -379,12 +378,18 @@ class GameController(DogPlayerInterface):
     
     def convert_available_list_to_matrix(self, available_moves: list) -> list:
         
-        matrix = [[self.board.board[j][i] == 0 for i in range(4)] for j in range(4)]
+        matrix = []
+        
+        for i in range(4):
+            row = []
+            for j in range(4):
+                row.append(self.board.board[i][j] == 0)
+            matrix.append(row)
         
         for i in range(10):
             if not available_moves[i]:
                 if i < 4:
-                    matrix[i] = [False for _ in range(4)]
+                    matrix[i] = [False, False, False, False]
                 elif i < 8:
                     for j in range(4):
                         matrix[j][i-4] = False
@@ -455,10 +460,10 @@ class GameController(DogPlayerInterface):
         match_status = self.get_match_status()
         
         if match_status == 2 or match_status == 5:
+            self.deck.reset()
+            self.board.reset()
             self.remote_player.reset()
             self.local_player.reset()
-            self.board.reset()
-            self.deck.reset()
             self.notification_manager.reset()
             self.set_match_status(1)
             self.update_interface()
