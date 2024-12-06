@@ -1,7 +1,7 @@
 from tkinter import Tk, PhotoImage
 from menu_interface import MenuInterface
 from game_controller import GameController
-from tutorial_interface import TutorialInterface
+from tkinter import simpledialog
 
 class MainController:
     def __init__(self):
@@ -10,52 +10,48 @@ class MainController:
         self.root.geometry("1280x720") # Tamanho da janela
         self.root.resizable(False, False)
         self.root.title("Soma10") # Titulo da janela
-        icon = PhotoImage(file="assets/icon.png") # Icone da janela
+        icon = PhotoImage(file="assets/icon.png") # Icone do app
         self.root.iconphoto(True, icon)
         
         # Inicializa as interfaces
         self.main_menu = MenuInterface(self)
-        self.tutorial_menu = TutorialInterface(self)
         self.game = GameController(self)
         
         
     def start(self):
         """Inicia o loop principal da interface gráfica."""
         
+        # Mostra o menu principal
+        self.main_menu.show()
+        
+        # Inicializa o DogActor
+        dog_actor = self.game.dog_actor
+        player_name = simpledialog.askstring(title="Soma10", prompt="Qual o seu nome?")
+        message = dog_actor.initialize(player_name, self.game)
+        
+        # Se estiver sem conexao, o jogo é encerrado
+        if message == "Você está sem conexão":
+            simpledialog.messagebox.showinfo("DogActor", "Você está sem conexão, o jogo será encerrado. Tente novamente.")
+            self.exit()
+            return
+        
+        else:
+            # Exibe a mensagem do DogActor como popup
+            simpledialog.messagebox.showinfo("DogActor", message)
+        
+        # Inicia o loop principal
         self.root.mainloop()
         
-    def setup(self):
-        """ Inicializa as interfaces do jogo."""
-        
-        self.main_menu = MenuInterface(self)
-        self.tutorial_menu = TutorialInterface(self)
-        self.game = GameController(self)
-
-    def show_menu(self):
-        """Exibe o menu principal."""
-        
-        self.game.interface.hide()
-        self.reset_game()
-        self.tutorial_menu.hide()
-        self.main_menu.show()
-
-    def show_tutorial(self):
-        """Exibe o tutorial."""
-        
-        self.main_menu.hide()
-        self.tutorial_menu.show()
         
     def start_game(self):
         """Inicia o jogo."""
         
+        self.game.start_match()
         self.main_menu.hide()
-        self.tutorial_menu.hide()
-        self.game.start_match(debug=True)
         
-    def reset_game(self):
-        """Reseta o jogo."""
+    def exit(self):
+        """Fecha a aplicação."""
         
-        self.game = GameController(self)
-        self.game.interface.hide()
+        self.root.destroy()
 
 

@@ -10,6 +10,7 @@ class UITools:
 
     def safe_execute(self, func, *args, **kwargs):
         """Executa métodos de forma segura, verificando a existência do canvas."""
+        
         if hasattr(self, 'canvas') and self.canvas.winfo_exists():
             return func(*args, **kwargs)
         return None
@@ -339,7 +340,9 @@ class UITools:
     def create_shop_button(self, quantity: int, command: callable):
         """Cria um botão para a loja de itens."""
         
-        base_image = self.merge_text_to_image("shop", quantity, "assets/jogo/comprar.png", "font_kid", 30, "#FF648D", 145, 21)
+        numero_x = 145 + (len(str(quantity))-1) * 2
+        
+        base_image = self.merge_text_to_image("shop", quantity, "assets/jogo/comprar.png", "font_kid", 30, "#FF648D", numero_x, 21)
         
         self.create_resizable_button(base_image, 640, 87, command, anchor="center")
         
@@ -395,5 +398,6 @@ class UITools:
         
     def clear_canvas(self):
         """Remove todos os elementos do canvas, se ele existir."""
+        
         if self.canvas.winfo_exists():
             self.safe_execute(self.canvas.delete, "all")

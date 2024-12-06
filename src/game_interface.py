@@ -6,6 +6,7 @@ class GameInterface(Interface):
         self.game_controller = game_controller
     
     def setup(self):
+        
         # Carrega e exibe o background
         self.ui_tools.load_and_display("bg", "assets/jogo/fundo.png", 0, 0)
         
@@ -19,11 +20,7 @@ class GameInterface(Interface):
         # Menu Jogador 2
         self.ui_tools.load_and_display("j2_card", "assets/jogo/jogador2.png", 900, 40)
         
-        self.ui_tools.write_text(text=f'{self.informacoes["j2_fichas"]} fichas', x=1013, y=195, size=43, color="white", font="font_kid") # qntd de fichas do jogador 2
-        self.ui_tools.write_text(text=f'{self.informacoes["j2_pontos"]} pontos', x=1028, y=92, size=34, color="white", font="font_kid") # qntd de pontos do jogador 2
-        
-        # Notificacoes do Jogo
-        self.display_notification()
+        self.ui_tools.write_text(text=f'{self.informacoes["j2_pontos"]} pontos', x=1023, y=132, size=34, color="white", font="font_kid") # qntd de pontos do jogador 2
         
         # Loja de itens
         self.ui_tools.create_shop_button(self.informacoes["shop_size"], self.game_controller.buy_card)
@@ -31,9 +28,9 @@ class GameInterface(Interface):
         # Tela de aguardando
         if self.informacoes["aguardando"]:
             self.ui_tools.load_and_display("aguardando", "assets/jogo/aguardando.png", 0, 0)
-        
-        # Botao de voltar para o menu e resetar game
-        self.ui_tools.create_resizable_button("assets/jogo/close.png", 1242, 40, self.game_controller.withdrawal)
+            
+        # Notificacoes do Jogo
+        self.display_notification()
             
         
     def render_board(self):
@@ -129,7 +126,7 @@ class GameInterface(Interface):
         self.ui_tools.clear_canvas()
         
         self.ui_tools.load_and_display("bg gameover", "assets/jogo/fundo gameover.png", 0, 0) # Carrega o background
-        self.ui_tools.create_resizable_button("assets/jogo/botao menu.png", 640, 630, self.main_controller.show_menu) # Botão de voltar para o menu
+        self.ui_tools.create_resizable_button("assets/jogo/botao menu.png", 640, 630, self.main_controller.exit) # Botão de encerrar jogo
         
         # renderiza a pontuação de cada jogador
         j2_textoX = 825 - (len(str(self.informacoes["j2_pontos"])) - 1) * 18

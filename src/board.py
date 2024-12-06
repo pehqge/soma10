@@ -15,21 +15,25 @@ class Board:
             9 : Retorna a diagonal secundária. 
         """
         
+        # Retorna a linha i
         if i < 4:
             return self.board[i]
         
+        # Retorna a coluna i-4
         elif i < 8:
             line = []
             for j in range(4):
                 line.append(self.board[j][i-4])
             return line
         
+        # Retorna a diagonal principal
         elif i == 8:
             line = []
             for j in range(4):
                 line.append(self.board[j][j])
             return line
         
+        # Retorna a diagonal secundária
         else:
             line = []
             for j in range(4):
@@ -60,8 +64,3 @@ class Board:
         else: # diagonal secundaria
             for x in range(4):
                 self.board[x][3 - x] = 0
-
-    def reset(self):
-        """Reinicia o tabuleiro voltando tudo para 0."""
-        
-        self.board = [[0 for _ in range(4)] for _ in range(4)]

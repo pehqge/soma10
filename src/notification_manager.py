@@ -4,10 +4,19 @@ class NotificationManager:
         
     def add_notification(self, notification: str):
         """Adiciona uma notificação à lista."""
+        
         # Insere a nova notificação no início da lista
         self.notifications.insert(0, notification)
         
-    def reset(self):
-        """Reseta as notificações."""
+    def notify_turn(self):
+        """Notifica o jogador de que é a sua vez."""
         
-        self.notifications = []
+        self.notifications.insert(0, "É seu turno!")
+        
+    def remove_turn_notification(self):
+        """Remove a notificação de que é a vez do jogador."""
+        
+        try:
+            self.notifications.remove("É seu turno!")
+        except ValueError:
+            pass
