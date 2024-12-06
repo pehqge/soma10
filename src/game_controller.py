@@ -51,20 +51,18 @@ class GameController(DogPlayerInterface):
     def request_connection(self):
         """Solicita ao servidor o início da partida. Fica em loop até que a conexão seja feita."""
 
-        # Se o status da partida for 1, solicita a conexão
-        if self.match_status == 1:
-            start_status = self.dog_actor.start_match(2)
-            code = start_status.get_code()
+        start_status = self.dog_actor.start_match(2)
+        code = start_status.get_code()
+        
+        if code in ["0", "1"]: # erro de conexao ou jogadores insuficientes
             
-            if code in ["0", "1"]: # erro de conexao ou jogadores insuficientes
-                
-                # Tenta novamente em 2 segundos se ainda não estiver conectado
-                self.interface.root.after(2000, self.request_connection)
-                
-            else:
-                
-                # Se conectou, inicia o jogo
-                self.initialize_game(start_status)
+            # Tenta novamente em 2 segundos se ainda não estiver conectado
+            self.interface.root.after(2000, self.request_connection)
+            
+        else:
+            
+            # Se conectou, inicia o jogo
+            self.initialize_game(start_status)
                 
 
     def initialize_game(self, start_status):
@@ -164,12 +162,13 @@ class GameController(DogPlayerInterface):
                 # Recebe os dados do movimento e os atualiza
                 self.deck.update_deck(move_data["deck"])
                 self.board.update_board(move_data["board"])
+                remote_score = self.remote_player.score
+                self.remote_player.update_score(move_data["remote_score"])
                 
                 # Se caso a pontuacao do jogador remoto for diferente, notifica ao usuario que ele pontuou
-                if self.remote_player.score != move_data["remote_score"]:
-                    self.notify(f"{self.remote_player.name} somou 10 e marcou {move_data['remote_score'] - self.remote_player.score} pontos!")
+                if remote_score < self.remote_player.score:
+                    self.notify(f"{self.remote_player.name} somou 10 e marcou {self.remote_player.score - remote_score} pontos!")
                 
-                self.remote_player.update_score(move_data["remote_score"])
                 
                 # Verificacao de equidade de cartas
                 cards = self.verify_card_equity()
