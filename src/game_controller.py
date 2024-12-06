@@ -420,8 +420,10 @@ class GameController(DogPlayerInterface):
         """Retorna se o jogador local venceu. (empate conta como vitória)"""
         
         if self.local_player.score >= self.remote_player.score:
+            self.local_player.attribute_victory()
             return True
         else:
+            self.remote_player.attribute_victory()
             return False
         
     def switch_turn(self):

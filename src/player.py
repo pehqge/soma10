@@ -7,6 +7,7 @@ class Player:
         self.id = id
         self.turn = False
         self.chosen_card = None
+        self.won_game = False
     
     def get_cards(self):
         """Retorna as cartas do jogador."""
@@ -55,3 +56,8 @@ class Player:
         """Atualiza o score do jogador."""
         
         self.score += score
+        
+    def attribute_victory(self):
+        """Atribui a vitória ao jogador."""
+        
+        self.won_game = True
