@@ -91,8 +91,10 @@ class GameController(DogPlayerInterface):
         
         # Compra 3 cartas para cada jogador
         for _ in range(3):
-            self.local_player.add_card(self.deck.buy_card())
-            self.remote_player.add_card(self.deck.buy_card())
+            local_card = self.deck.buy_card()
+            self.local_player.add_card(local_card)
+            remote_card = self.deck.buy_card()
+            self.remote_player.add_card(remote_card)
         
         # Envia as cartas iniciais para o adversário
         self.send_move("dealing_initial_cards")
