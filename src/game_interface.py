@@ -20,7 +20,7 @@ class GameInterface(Interface):
         # Menu Jogador 2
         self.ui_tools.load_and_display("j2_card", "assets/jogo/jogador2.png", 900, 40)
         
-        self.ui_tools.write_text(text=f'{self.informacoes["j2_pontos"]} pontos', x=1023, y=132, size=34, color="white", font="font_kid") # qntd de pontos do jogador 2
+        self.ui_tools.write_text(text=f'{self.informacoes["j2_pontos"]} points', x=1028, y=132, size=34, color="white", font="font_kid") # qntd de pontos do jogador 2
         
         # Loja de itens
         self.ui_tools.create_shop_button(self.informacoes["shop_size"], self.game_controller.buy_card)
@@ -62,7 +62,7 @@ class GameInterface(Interface):
         
         # Inicializa o card e a pontuacao do jogador 1
         self.ui_tools.load_and_display("j1_card", "assets/jogo/jogador1.png", 19, 42)
-        self.ui_tools.write_text(text=f'{points} pontos', x=137, y=92, size=34, color="white", font="font_kid")
+        self.ui_tools.write_text(text=f'{points} points', x=147, y=92, size=34, color="white", font="font_kid")
     
         # Renderiza as fichas que o jogador 1 tem em mão
         for card_number in range(1,8):
@@ -131,15 +131,15 @@ class GameInterface(Interface):
         # renderiza a pontuação de cada jogador
         j2_textoX = 825 - (len(str(self.informacoes["j2_pontos"])) - 1) * 18
         
-        self.ui_tools.write_text(text=f'{self.informacoes["j1_pontos"]} pontos', x=316, y=466, size=34, color="#FF648D", font="quicksand")
-        self.ui_tools.write_text(text=f'{self.informacoes["j2_pontos"]} pontos', x=j2_textoX, y=466, size=34, color="#FF648D", font="quicksand")
+        self.ui_tools.write_text(text=f'{self.informacoes["j1_pontos"]} points', x=316, y=466, size=34, color="#FF648D", font="quicksand")
+        self.ui_tools.write_text(text=f'{self.informacoes["j2_pontos"]} points', x=j2_textoX, y=466, size=34, color="#FF648D", font="quicksand")
         
         
         # anuncio do vencedor
         if local_win:
-            self.ui_tools.write_text("Você é o vencedor!!", 348, 260, 64, "#F7AA00", "quicksand", 1000)
+            self.ui_tools.write_text("You are the winner!!", 348, 260, 64, "#F7AA00", "quicksand", 1000)
         else:
-            self.ui_tools.write_text("Você perdeu! :(", 420, 260, 64, "#FF648D", "quicksand", 1000)
+            self.ui_tools.write_text("You lost! :(", 420, 260, 64, "#FF648D", "quicksand", 1000)
             
         # posicao da coroa
         coroaX = 216

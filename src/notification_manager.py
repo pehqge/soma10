@@ -11,12 +11,12 @@ class NotificationManager:
     def notify_turn(self):
         """Notifica o jogador de que é a sua vez."""
         
-        self.notifications.insert(0, "É seu turno!")
+        self.notifications.insert(0, "It's your turn!")
         
     def remove_turn_notification(self):
         """Remove a notificação de que é a vez do jogador."""
         
         try:
-            self.notifications.remove("É seu turno!")
+            self.notifications.remove("It's your turn!")
         except ValueError:
             pass

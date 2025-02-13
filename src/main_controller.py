@@ -2,6 +2,7 @@ from tkinter import Tk, PhotoImage
 from menu_interface import MenuInterface
 from game_controller import GameController
 from tkinter import simpledialog
+from ui_tools import UITools
 
 class MainController:
     def __init__(self):
@@ -9,8 +10,8 @@ class MainController:
         self.root = Tk()
         self.root.geometry("1280x720") # Tamanho da janela
         self.root.resizable(False, False)
-        self.root.title("Soma10") # Titulo da janela
-        icon = PhotoImage(file="assets/icon.png") # Icone do app
+        self.root.title("Sum10") # Titulo da janela
+        icon = PhotoImage(file=UITools(self.root).resource_path("assets/icon.png")) # Icone do app
         self.root.iconphoto(True, icon)
         
         # Inicializa as interfaces
@@ -26,18 +27,18 @@ class MainController:
         
         # Inicializa o DogActor
         dog_actor = self.game.dog_actor
-        player_name = simpledialog.askstring(title="Soma10", prompt="Qual o seu nome?")
+        player_name = simpledialog.askstring(title="Sum10", prompt="What's your name?")
         message = dog_actor.initialize(player_name, self.game)
         
         # Se estiver sem conexao, o jogo é encerrado
         if message == "Você está sem conexão":
-            simpledialog.messagebox.showinfo("DogActor", "Você está sem conexão, o jogo será encerrado. Tente novamente.")
+            simpledialog.messagebox.showinfo("DogActor", "Error with the server. The game will be closed. Please open the game and try again.")
             self.exit()
             return
         
         else:
             # Exibe a mensagem do DogActor como popup
-            simpledialog.messagebox.showinfo("DogActor", message)
+            simpledialog.messagebox.showinfo("Server", "You are connected to the server")
         
         # Inicia o loop principal
         self.root.mainloop()

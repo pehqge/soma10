@@ -21,8 +21,8 @@ class GameController(DogPlayerInterface):
         
         # Inicializa as classes
         self.board = Board()
-        self.local_player = Player("Jogador 1", 1)
-        self.remote_player = Player("Jogador 2", 2)
+        self.local_player = Player("Player 1", 1)
+        self.remote_player = Player("Player 2", 2)
         self.deck = CardDeck()
         self.notification_manager = NotificationManager()
         self.interface = GameInterface(main_controller, self)
@@ -42,7 +42,7 @@ class GameController(DogPlayerInterface):
         self.interface.show()
         self.interface.setup()
         
-        self.notify("Aguardando o outro jogador se conectar ao jogo...")
+        self.notify("Waiting for the remote player to connect...")
         
         # Tenta fazer a conexão com o servidor
         self.request_connection()
@@ -79,7 +79,7 @@ class GameController(DogPlayerInterface):
         self.remote_player.update_info(remote_info)
         
         # Exibe a notificação de início da partida
-        self.notify(f"O jogador {remote_info[0]} se conectou ao jogo! Iniciando partida...")
+        self.notify(f"The player {remote_info[0]} has connected! Starting the match...")
 
         # Vez do jogador local 
         self.set_match_status(3) 
@@ -122,7 +122,7 @@ class GameController(DogPlayerInterface):
         self.remote_player.update_info(remote_info)
         
         # Exibe a notificação de início da partida
-        self.notify(f"O jogador {remote_info[0]} iniciou a partida!")
+        self.notify(f"The player {remote_info[0]} has started the match!")
         
         self.update_interface()
     
@@ -169,7 +169,7 @@ class GameController(DogPlayerInterface):
                 
                 # Se caso a pontuacao do jogador remoto for diferente, notifica ao usuario que ele pontuou
                 if remote_score < self.remote_player.score:
-                    self.notify(f"{self.remote_player.name} somou 10 e marcou {self.remote_player.score - remote_score} pontos!")
+                    self.notify(f"{self.remote_player.name} summed 10 and scored {self.remote_player.score - remote_score} points!")
                 
                 
                 # Verificacao de equidade de cartas
@@ -214,7 +214,7 @@ class GameController(DogPlayerInterface):
         
         # Define o status da partida como 5 (jogo abandonado)
         self.set_match_status(5)
-        self.notify("O outro jogador saiu da partida. O jogo irá fechar em 5 segundos...")
+        self.notify("The other player has left the match. The game will be closed.")
         
         # Encerra a aplicação depois de 5 segundos (para dar tempo do usuário ler a mensagem)
         self.interface.root.after(5000, self.main_controller.exit)
@@ -261,7 +261,7 @@ class GameController(DogPlayerInterface):
                     pontos += 4
             
             if pontos > 0:
-                self.notify(f"Você somou 10 e marcou {pontos} pontos!")
+                self.notify(f"You summed 10 and scored {pontos} points!")
             
             # Compra uma carta para o jogador
             self.buy_card("system")
@@ -296,7 +296,7 @@ class GameController(DogPlayerInterface):
                 
                 # Se tiver, não deixa ele comprar
                 if any(True in row for row in availables_matrix):
-                    self.notify("Ainda há jogadas disponíveis, não é possível comprar cartas.")
+                    self.notify("You still have available moves! You can't buy a card.")
                     return
         
         empty = self.deck.is_empty()
@@ -318,7 +318,7 @@ class GameController(DogPlayerInterface):
         else:
             
             # Se o baralho está vazio, começa o processo de verificação de game over
-            self.notify("Baralho está vazio! Não é possível comprar cartas.")
+            self.notify("The deck is empty! It's not possible to buy a card.")
             
             # Se foi o sistema que chamou, verificar se o jogador possui jogadas a se fazer
             if called == "system":

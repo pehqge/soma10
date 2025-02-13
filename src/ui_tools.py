@@ -1,6 +1,8 @@
 from tkinter import NW, Canvas
 from PIL import Image, ImageDraw, ImageFont, ImageTk
 import math
+import os
+import sys
 
 class UITools:
     def __init__(self, canvas: Canvas):
@@ -14,6 +16,15 @@ class UITools:
         if hasattr(self, 'canvas') and self.canvas.winfo_exists():
             return func(*args, **kwargs)
         return None
+    
+    def resource_path(self, relative_path):
+        """ Retorna o caminho correto para arquivos, funciona no desenvolvimento e no .app """
+        try:
+            base_path = sys._MEIPASS  # PyInstaller cria essa pasta temporária ao rodar um .app
+        except AttributeError:
+            base_path = os.path.abspath(".")
+
+        return os.path.join(base_path, relative_path)
 
     def load_image(self, key: str, filepath: str):
         """Armazena uma imagem no dicionário de imagens."""
@@ -21,7 +32,7 @@ class UITools:
         if key in self.images:
             return self.images[key]
         
-        image = ImageTk.PhotoImage(file=filepath)
+        image = ImageTk.PhotoImage(file=self.resource_path(filepath))
         self.images[key] = image
         return image
 
@@ -108,7 +119,7 @@ class UITools:
     def create_text_image(self, text: str, size: int, color: str, font: str, width: int, height: int, x_offset=0, y_offset=0, center=False):
         """Cria uma imagem Pillow do texto"""
         
-        font_path = f"assets/jogo/{font}.ttf"
+        font_path = self.resource_path(f"assets/jogo/{font}.ttf")
         font_obj = ImageFont.truetype(font_path, size)
 
         # Cria uma imagem com fundo transparente
@@ -178,7 +189,7 @@ class UITools:
 
             # Carrega a imagem base
             try:
-                base_image = Image.open(image_filename).convert("RGBA")
+                base_image = Image.open(self.resource_path(image_filename)).convert("RGBA")
             except FileNotFoundError:
                 raise FileNotFoundError(f"Imagem não encontrada: {image_filename}")
 
@@ -249,7 +260,7 @@ class UITools:
         dark_image_key = f"dark_{card_number}"
         if dark_image_key not in self.images:
             # Carrega a imagem original
-            original_image = Image.open(f"assets/jogo/{card_number}.png").convert("RGBA")
+            original_image = Image.open(self.resource_path(f"assets/jogo/{card_number}.png")).convert("RGBA")
             # Reduz o brilho da imagem
             dark_image = original_image.point(lambda p: p * 0.5)
             # Converte a imagem para o formato compatível com Tkinter
@@ -276,7 +287,7 @@ class UITools:
         empty_cell_key = 'cell_empty'
         
         if empty_cell_key not in self.images:
-            empty_cell_image = Image.open("assets/jogo/0.png").convert("RGBA")
+            empty_cell_image = Image.open(self.resource_path("assets/jogo/0.png")).convert("RGBA")
             empty_cell_tk = ImageTk.PhotoImage(empty_cell_image)
             self.images[empty_cell_key] = empty_cell_tk
         else:
@@ -293,7 +304,7 @@ class UITools:
             # Coloca a imagem da carta na célula
             card_key = f'card_{card_number}'
             if card_key not in self.images:
-                card_image = Image.open(f"assets/jogo/{card_number}.png").convert("RGBA").resize((110, 110))
+                card_image = Image.open(self.resource_path(f"assets/jogo/{card_number}.png")).convert("RGBA").resize((110, 110))
                 card_tk = ImageTk.PhotoImage(card_image)
                 self.images[card_key] = card_tk
             else:
@@ -312,13 +323,13 @@ class UITools:
             text = str(text)
         
         # Abre a imagem base
-        base_image = Image.open(image_path).convert("RGBA")
+        base_image = Image.open(self.resource_path(image_path)).convert("RGBA")
     
         # Cria um objeto de desenho
         draw = ImageDraw.Draw(base_image)
 
         # Carrega a fonte
-        font_path = f"assets/jogo/{font_name}.ttf"
+        font_path = self.resource_path(f"assets/jogo/{font_name}.ttf")
         font = ImageFont.truetype(font_path, font_size)
 
         if len(text) > 1:  # Se o texto tiver mais de um caractere, centraliza
