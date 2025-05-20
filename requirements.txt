@@ -3,5 +3,5 @@ charset-normalizer==3.4.0
 idna==3.10
 pillow==10.4.0
 requests==2.32.3
-setuptools==75.2.0
+setuptools==78.1.1
 urllib3==2.2.3
